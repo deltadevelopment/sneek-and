@@ -10,8 +10,6 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map;
 
-import no.twomonkeys.sneek.app.MainActivity;
-
 /**
  * 26/09/16 by chridal
  * Copyright 2MONKEYS AS
