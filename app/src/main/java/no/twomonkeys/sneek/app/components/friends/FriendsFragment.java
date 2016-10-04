@@ -2,6 +2,7 @@ package no.twomonkeys.sneek.app.components.friends;
 
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
+import android.support.v4.content.ContextCompat;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
@@ -21,7 +22,7 @@ public class FriendsFragment extends Fragment {
     private RecyclerView.Adapter fAdapter;
     private RecyclerView.LayoutManager mLayoutManager;
 
-    public static FriendsFragment newInstance(int page, String title) {
+    public static FriendsFragment newInstance(){
         FriendsFragment friendsFragment = new FriendsFragment();
         return friendsFragment;
     }
@@ -36,13 +37,15 @@ public class FriendsFragment extends Fragment {
                              Bundle savedInstanceState) {
         View view = inflater.inflate(R.layout.friends, container, false);
 
+        // getActivity().setTitle("Friends");
+
         fRecyclerView = (RecyclerView) view.findViewById(R.id.following_recycler_view);
 
         fRecyclerView.setLayoutManager(new LinearLayoutManager(getActivity()));
 
         fRecyclerView.setHasFixedSize(true);
 
-        String[] myDataset = {"Hello", "Hallo", "Hei"};
+        String[] myDataset = {"Hello", "Hallo", "Hei", "Juice", "Kapteinen" };
 
         fAdapter = new FriendsAdapter(myDataset);
         fRecyclerView.setAdapter(fAdapter);

@@ -15,15 +15,10 @@ import no.twomonkeys.sneek.R;
  */
 
 public class SecondFragment extends Fragment {
-    // Store instance variables
-    private String title;
-    private int page;
 
-    public static SecondFragment newInstance(int page, String title) {
+    public static SecondFragment newInstance(){
         SecondFragment secondFragment = new SecondFragment();
         Bundle args = new Bundle();
-        args.putInt("someInt", page);
-        args.putString("someTitle", title);
         secondFragment.setArguments(args);
         return secondFragment;
     }
@@ -31,14 +26,14 @@ public class SecondFragment extends Fragment {
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        page = getArguments().getInt("someInt", 0);
-        title = getArguments().getString("someTitle");
     }
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
         View view = inflater.inflate(R.layout.fragment_second, container, false);
+
+        // getActivity().setTitle("sneek");
 
         return view;
     }

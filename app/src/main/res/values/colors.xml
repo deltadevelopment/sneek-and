@@ -3,4 +3,16 @@
     <color name="colorPrimary">#3F51B5</color>
     <color name="colorPrimaryDark">#303F9F</color>
     <color name="colorAccent">#FF4081</color>
+
+
+
+
+
+
+    <color name="white">#FFFFFF</color>
+
+    <color name="circleRed">#FF99B0</color>
+    <color name="circleBlue">#7EACE1</color>
+    <color name="circleGreen">#74E6CD</color>
+    <color name="circleGrey">#DEDEDE</color>
 </resources>
