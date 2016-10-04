@@ -9,7 +9,12 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 
+import java.util.ArrayList;
+
 import no.twomonkeys.sneek.R;
+import no.twomonkeys.sneek.app.shared.interfaces.ArrayCallback;
+import no.twomonkeys.sneek.app.shared.models.ErrorModel;
+import no.twomonkeys.sneek.app.shared.models.FollowingModel;
 
 /**
  * Created by Christian Dalsvaag on 27/09/16
@@ -37,18 +42,20 @@ public class FriendsFragment extends Fragment {
                              Bundle savedInstanceState) {
         View view = inflater.inflate(R.layout.friends, container, false);
 
-        // getActivity().setTitle("Friends");
-
         fRecyclerView = (RecyclerView) view.findViewById(R.id.following_recycler_view);
 
         fRecyclerView.setLayoutManager(new LinearLayoutManager(getActivity()));
 
         fRecyclerView.setHasFixedSize(true);
 
-        String[] myDataset = {"Hello", "Hallo", "Hei", "Juice", "Kapteinen" };
-
-        fAdapter = new FriendsAdapter(myDataset);
-        fRecyclerView.setAdapter(fAdapter);
+        // Fetch the data
+        FollowingModel.fetchAll(new ArrayCallback() {
+            @Override
+            public void exec(ArrayList arrayList, ErrorModel errorModel) {
+                fAdapter = new FriendsAdapter(arrayList);
+                fRecyclerView.setAdapter(fAdapter);
+            }
+        });
 
         return view;
     }

@@ -16,7 +16,7 @@ import retrofit2.converter.gson.GsonConverterFactory;
  */
 
 public class ServiceGenerator {
-    public static final String API_BASE_URL = "https://dev.snikksnakk.net/v1/";
+    public static final String API_BASE_URL = "https://dev.sneek.me/";
 
     private static OkHttpClient.Builder httpClient = new OkHttpClient.Builder();
 

@@ -14,11 +14,6 @@ import java.util.Map;
 import no.twomonkeys.sneek.app.shared.MapCallback;
 import no.twomonkeys.sneek.app.shared.SimpleCallback;
 import no.twomonkeys.sneek.app.shared.apis.SneekApi;
-import no.twomonkeys.sneek.app.shared.helpers.Contract;
-import no.twomonkeys.sneek.app.shared.helpers.DataHelper;
-import no.twomonkeys.sneek.app.shared.helpers.ProgressRequestBody;
-import no.twomonkeys.sneek.app.shared.helpers.ServiceGenerator;
-import no.twomonkeys.sneek.app.shared.helpers.ServiceGenerator2;
 import no.twomonkeys.sneek.app.shared.models.ErrorModel;
 import no.twomonkeys.sneek.app.shared.models.ResponseModel;
 import okhttp3.MediaType;
@@ -33,9 +28,6 @@ public class NetworkHelper {
     private static final String TAG = "NetworkHelper";
     private static String auth_token;
     private static SneekApi networkService;
-    //public static SneekApi userService = ServiceGenerator.createService(SneekApi.class, DataHelper.getAuthToken());
-    public static SneekApi userService2 = ServiceGenerator.createService(SneekApi.class, null);
-
 
     public static void sendRequest(Call<ResponseModel> call, final Contract contract, final MapCallback mcb, final SimpleCallback scb) {
         call.enqueue(new Callback<ResponseModel>() {
@@ -58,7 +50,9 @@ public class NetworkHelper {
 
     public static SneekApi getNetworkService()
     {
-        String authToken = DataHelper.getAuthToken();
+        // TODO: When implementing login replace this
+        // String authToken = DataHelper.getAuthToken();
+        String authToken = "f383f4ad296fd296a8d955f389774492";
         if (authToken != auth_token)
         {
             auth_token = authToken;
@@ -110,69 +104,5 @@ public class NetworkHelper {
             }
         }
     }
-
-    public static void uploadFile(File file, String url, final SimpleCallback scb) {
-        // create upload service client
-        //already creatd
-
-        // use the FileUtils to get the actual file by uri
-//        File file = new File(inputFileUri.getPath());
-        Log.v("FILE PATH", "file path is " + file.getAbsolutePath());
-        SneekApi service =
-                ServiceGenerator2.createService(SneekApi.class);
-
-        // create RequestBody instance from file
-        RequestBody requestFile = RequestBody.create(MediaType.parse("image/jpg"), file);
-
-
-        String uri = Uri.parse(url)
-                .buildUpon()
-                .build().toString();
-
-        Call<ResponseBody> call = service.upload(uri, requestFile);
-
-        call.enqueue(new Callback<ResponseBody>() {
-            @Override
-            public void onResponse(Call<ResponseBody> call,
-                                   Response<ResponseBody> response) {
-                Log.v("Upload", "success");
-                scb.callbackCall(null);
-            }
-
-            @Override
-            public void onFailure(Call<ResponseBody> call, Throwable t) {
-                Log.e("Upload error:", t.getMessage());
-            }
-        });
-    }
-
-    public static void uploadFile2(File file, String url, final SimpleCallback scb, ProgressRequestBody.UploadCallbacks listener) {
-        SneekApi service =
-                ServiceGenerator2.createService(SneekApi.class);
-
-        ProgressRequestBody prb = new ProgressRequestBody(file, listener);
-        RequestBody requestFile = ProgressRequestBody.create(MediaType.parse("image/jpg"), file);
-
-        String uri = Uri.parse(url)
-                .buildUpon()
-                .build().toString();
-
-        Call<ResponseBody> call = service.upload(uri, prb);
-
-        call.enqueue(new Callback<ResponseBody>() {
-            @Override
-            public void onResponse(Call<ResponseBody> call,
-                                   Response<ResponseBody> response) {
-                Log.v("Upload", "success");
-                scb.callbackCall(null);
-            }
-
-            @Override
-            public void onFailure(Call<ResponseBody> call, Throwable t) {
-                Log.e("Upload error:", t.getMessage());
-            }
-        });
-    }
-
 }
 

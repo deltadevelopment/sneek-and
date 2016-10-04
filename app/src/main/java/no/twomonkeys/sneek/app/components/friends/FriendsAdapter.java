@@ -17,9 +17,11 @@ import android.widget.TextView;
 
 import org.w3c.dom.Text;
 
+import java.util.ArrayList;
 import java.util.Random;
 
 import no.twomonkeys.sneek.R;
+import no.twomonkeys.sneek.app.shared.models.FollowingModel;
 
 /**
  * 27/09/16 by chridal
@@ -28,12 +30,12 @@ import no.twomonkeys.sneek.R;
 
 class FriendsAdapter extends RecyclerView.Adapter<FriendsAdapter.ViewHolder> {
 
-    private String[] myDataSet;
+    private ArrayList<FollowingModel> followings;
 
     private Context mContext;
 
-    FriendsAdapter(String[] dataSet){
-        myDataSet = dataSet;
+    FriendsAdapter(ArrayList<FollowingModel> followings){
+        this.followings = followings;
     }
 
     static class ViewHolder extends RecyclerView.ViewHolder{
@@ -64,8 +66,10 @@ class FriendsAdapter extends RecyclerView.Adapter<FriendsAdapter.ViewHolder> {
 
     @Override
     public void onBindViewHolder(ViewHolder holder, int position) {
-        holder.usernameTv.setText(myDataSet[position]);
-        holder.firstLettersTv.setText(myDataSet[position].substring(0, 2));
+        FollowingModel following = followings.get(position);
+
+        holder.usernameTv.setText(following.getFollowee().getUsername());
+        holder.firstLettersTv.setText(following.getFollowee().getUsername().substring(0, 2));
 
         setRandomColor(holder);
 
@@ -73,7 +77,7 @@ class FriendsAdapter extends RecyclerView.Adapter<FriendsAdapter.ViewHolder> {
 
     @Override
     public int getItemCount() {
-        return myDataSet.length;
+        return followings.size();
     }
 
     private void setRandomColor(ViewHolder holder) {
