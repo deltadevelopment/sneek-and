@@ -4,9 +4,19 @@
     android:layout_height="match_parent"
     android:orientation="vertical">
 
+    <fragment
+        android:id="@+id/cameraFragment"
+        class="no.twomonkeys.sneek.app.components.camera.CameraFragment"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:background="@color/circleGreen" />
+
     <android.support.v4.view.ViewPager
         android:id="@+id/vpPager"
         android:layout_width="match_parent"
         android:layout_height="wrap_content">
     </android.support.v4.view.ViewPager>
+
+
+
 </LinearLayout>

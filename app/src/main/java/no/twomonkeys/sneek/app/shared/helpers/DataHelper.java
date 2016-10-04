@@ -101,7 +101,7 @@ public class DataHelper {
         Gson gson = new Gson();
         String wrapperStr = settings.getString("blockedUsers", null);
         if (wrapperStr != null) {
-            MapWrapper wrapper = gson.fromJson(wrapperStr, MapWrapper.class);
+            IntegerWrapper wrapper = gson.fromJson(wrapperStr, IntegerWrapper.class);
             HashMap<String, Integer> HtKpi = wrapper.getMyMap();
             return HtKpi;
         } else {
@@ -114,7 +114,7 @@ public class DataHelper {
         blockedUsers.put(userId + "", userId);
 
         Gson gson = new Gson();
-        MapWrapper wrapper = new MapWrapper();
+        IntegerWrapper wrapper = new IntegerWrapper();
         wrapper.setMyMap(blockedUsers);
         String serializedMap = gson.toJson(wrapper);
 
@@ -130,7 +130,7 @@ public class DataHelper {
         blockedUsers.remove(userId + "");
 
         Gson gson = new Gson();
-        MapWrapper wrapper = new MapWrapper();
+        IntegerWrapper wrapper = new IntegerWrapper();
         wrapper.setMyMap(blockedUsers);
         String serializedMap = gson.toJson(wrapper);
 
@@ -209,7 +209,7 @@ public class DataHelper {
 
     public static void storeTagStreams(HashMap<String, String> map) {
         Gson gson = new Gson();
-        MapWrapper2 wrapper = new MapWrapper2();
+        StringWrapper wrapper = new StringWrapper();
         wrapper.setMyMap(map);
         String serializedMap = gson.toJson(wrapper);
 
@@ -225,7 +225,7 @@ public class DataHelper {
         Gson gson = new Gson();
         String wrapperStr = settings.getString("tagStreams", null);
         if (wrapperStr != null) {
-            MapWrapper2 wrapper = gson.fromJson(wrapperStr, MapWrapper2.class);
+            StringWrapper wrapper = gson.fromJson(wrapperStr, StringWrapper.class);
             HashMap<String, String> HtKpi = wrapper.getMyMap();
             return HtKpi;
         } else {
@@ -299,4 +299,33 @@ public class DataHelper {
     public static Map<String, String> getImageCacheMapHelper() {
         return imageCacheMapHelper;
     }
+
+    //Wrapper classes to be used with serialization with json objects
+    public static class StringWrapper {
+        private HashMap<String, String> myMap;
+
+        public HashMap<String, String> getMyMap() {
+            return myMap;
+        }
+
+        public void setMyMap(HashMap<String, String> myMap) {
+            this.myMap = myMap;
+        }
+    }
+
+    public static class IntegerWrapper {
+        private HashMap<String, Integer> myMap;
+        // getter and setter for 'myMap'
+
+        public HashMap<String, Integer> getMyMap() {
+            return myMap;
+        }
+
+        public void setMyMap(HashMap<String, Integer> myMap) {
+            this.myMap = myMap;
+        }
+    }
 }
+
+
+
