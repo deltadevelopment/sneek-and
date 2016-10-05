@@ -2,6 +2,8 @@ package no.twomonkeys.sneek.app.components.camera;
 
 import android.annotation.SuppressLint;
 import android.content.Context;
+import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
 import android.hardware.Camera;
 import android.util.Log;
 import android.view.SurfaceHolder;
@@ -9,6 +11,9 @@ import android.view.SurfaceView;
 import android.view.View;
 import android.view.ViewGroup;
 
+import java.io.File;
+import java.io.FileNotFoundException;
+import java.io.FileOutputStream;
 import java.io.IOException;
 import java.util.List;
 
@@ -43,7 +48,9 @@ class CameraPreview extends ViewGroup implements SurfaceHolder.Callback {
     }
 
     public void setCamera(Camera camera) {
-        if (mCamera == camera) { return; }
+        if (mCamera == camera) {
+            return;
+        }
 
         stopPreviewAndFreeCamera();
 
@@ -74,12 +81,13 @@ class CameraPreview extends ViewGroup implements SurfaceHolder.Callback {
         parameters.setRotation(90);
         parameters.setPreviewSize(mPreviewSize.width, mPreviewSize.height);
         requestLayout();
-        Log.v("Camera","Trying to set parameters " + mPreviewSize.width + " : " + mPreviewSize.height);
+        Log.v("Camera", "Trying to set parameters " + mPreviewSize.width + " : " + mPreviewSize.height);
+        parameters.setPictureSize(mPreviewSize.width, mPreviewSize.height);
         mCamera.setParameters(parameters);
 
         // Important: Call startPreview() to start updating the preview surface.
         // Preview must be started before you can take a picture.
-        Log.v("Camera","Starting preview");
+        Log.v("Camera", "Starting preview");
 
         mCamera.startPreview();
     }
@@ -100,13 +108,13 @@ class CameraPreview extends ViewGroup implements SurfaceHolder.Callback {
         final int height = resolveSize(getSuggestedMinimumHeight(), heightMeasureSpec);
         setMeasuredDimension(width, height);
         if (mSupportedPreviewSizes != null) {
-            Log.v("","width/height " + width + " : " + height);
+            Log.v("", "width/height " + width + " : " + height);
             mPreviewSize = getOptimalPreviewSize(mSupportedPreviewSizes, width, height);
         }
         if (mCamera != null) {
             Camera.Parameters parameters = mCamera.getParameters();
             parameters.setPreviewSize(mPreviewSize.width, mPreviewSize.height);
-
+            parameters.setPictureSize(mPreviewSize.width, mPreviewSize.height);
             mCamera.setParameters(parameters);
         }
     }
@@ -114,7 +122,7 @@ class CameraPreview extends ViewGroup implements SurfaceHolder.Callback {
 
     private Camera.Size getOptimalPreviewSize(List<Camera.Size> sizes, int w, int h) {
         final double ASPECT_TOLERANCE = 0.1;
-        double targetRatio=(double)h / w;
+        double targetRatio = (double) h / w;
 
         if (sizes == null) return null;
 
@@ -195,14 +203,14 @@ class CameraPreview extends ViewGroup implements SurfaceHolder.Callback {
                 previewHeight = mPreviewSize.height;
             }
 
-            double newHeight = width*1.333333;
+            double newHeight = width * 1.333333;
 
             // Center the child SurfaceView within the parent.
             if (width * previewHeight > height * previewWidth) {
                 final int scaledChildWidth = previewWidth * height
                         / previewHeight;
-                child.layout((width - scaledChildWidth), 0,
-                        (width + scaledChildWidth), height);
+                child.layout(0, 0,
+                        width, height);
             } else {
                 final int scaledChildHeight = previewHeight * width
                         / previewWidth;
@@ -212,6 +220,30 @@ class CameraPreview extends ViewGroup implements SurfaceHolder.Callback {
         }
     }
 
+    //Camera actions
+
+    public void switchCamera(Camera camera) {
+        if (mCamera == camera) {
+            return;
+        }
+        mCamera = camera;
+
+        if (mCamera != null) {
+            try {
+                mCamera.setPreviewDisplay(mHolder);
+                mCamera.setDisplayOrientation(90);
+                Camera.Parameters parameters = mCamera.getParameters();
+                parameters.setRotation(90);
+                parameters.setPreviewSize(mPreviewSize.width,mPreviewSize.height);
+                parameters.setPictureSize(mPreviewSize.width, mPreviewSize.height);
+                mCamera.setParameters(parameters);
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+
+            mCamera.startPreview();
+        }
+    }
 
 
 }

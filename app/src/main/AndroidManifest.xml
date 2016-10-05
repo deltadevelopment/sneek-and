@@ -19,7 +19,9 @@
         android:label="@string/app_name"
         android:supportsRtl="true"
         android:theme="@style/Theme.AppCompat.NoActionBar" >
-        <activity android:name="no.twomonkeys.sneek.app.components.MainActivity" android:screenOrientation="portrait">
+        <activity android:name="no.twomonkeys.sneek.app.components.MainActivity"
+            android:screenOrientation="portrait"
+            android:windowSoftInputMode="adjustNothing">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
 

@@ -2,6 +2,7 @@ package no.twomonkeys.sneek.app.shared.helpers;
 
 import android.content.Context;
 import android.util.DisplayMetrics;
+import android.util.Log;
 import android.view.Display;
 import android.view.WindowManager;
 
@@ -25,6 +26,14 @@ public class UIHelper {
         int width = display.getWidth();  // deprecated
         int height = display.getHeight();  // deprecated
         return height;
+    }
+
+    //TODO: Should move this out to a own util class
+    static public int toAlpha(float alpha) {
+        int max = 256;
+        float result = (max * alpha);
+        Log.v("RESULT", "Result is " + result);
+        return (int) result;
     }
 
 

@@ -5,26 +5,75 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent">
 
+
+
     <FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
         android:id="@+id/cameraPreview"
         android:layout_width="fill_parent"
         android:layout_height="fill_parent" />
-
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:layout_alignParentBottom="true"
+        android:orientation="horizontal"
+        android:background="@color/white"
+        android:gravity="center"
+        android:baselineAligned="true"
+        android:id="@+id/bottom_bar">
+        <Space
+            android:layout_width="0dp"
+            android:layout_height="1dp"
+            android:layout_weight="1" >
+        </Space>
+        <ImageButton
+            android:id="@+id/flash_button"
+            android:layout_centerVertical="true"
+            android:layout_width="25dp"
+            android:layout_height="25dp"
+            android:src="@drawable/flashx3"
+            android:background="@color/transparent"
+            android:scaleType="fitCenter"
+            />
+        <Space
+            android:layout_width="0dp"
+            android:layout_height="1dp"
+            android:layout_weight="1" >
+        </Space>
+        <ImageButton
+            android:id="@+id/camera_btn"
+            android:layout_centerVertical="true"
+            android:layout_width="70dp"
+            android:layout_height="70dp"
+            android:src="@drawable/camera"
+            android:background="@color/transparent"
+            android:scaleType="fitCenter"
+            />
+        <Space
+            android:layout_width="0dp"
+            android:layout_height="1dp"
+            android:layout_weight="1" >
+        </Space>
+        <ImageButton
+            android:id="@+id/selfie_button"
+            android:layout_centerVertical="true"
+            android:layout_width="30dp"
+            android:layout_height="30dp"
+            android:src="@drawable/selfiex3"
+            android:background="@color/transparent"
+            android:scaleType="fitCenter"
+            />
+        <Space
+            android:layout_width="0dp"
+            android:layout_height="1dp"
+            android:layout_weight="1" >
+        </Space>
+    </LinearLayout>
 
     <RelativeLayout
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:layout_alignParentBottom="true"
-        android:background="@color/white"
-        android:id="@+id/bottomBar">
-        
-        <Button
-            android:layout_width="50dp"
-            android:layout_height="50dp"
-            android:layout_centerVertical="true"
-            android:background="@color/circleBlue"
-            android:id="@+id/flashButton"/>
-        
+        android:id="@+id/fragment_container">
+
     </RelativeLayout>
 
 </RelativeLayout>
