@@ -1,11 +1,13 @@
 package no.twomonkeys.sneek.app.components.camera;
 
 import android.annotation.SuppressLint;
+import android.app.Activity;
 import android.content.Context;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.hardware.Camera;
 import android.util.Log;
+import android.view.Surface;
 import android.view.SurfaceHolder;
 import android.view.SurfaceView;
 import android.view.View;
@@ -32,6 +34,7 @@ class CameraPreview extends ViewGroup implements SurfaceHolder.Callback {
     Camera mCamera;
     Camera.Size mPreviewSize;
     List<Camera.Size> mSupportedPreviewSizes;
+    boolean flashOn;
 
 
     CameraPreview(Context context) {
@@ -46,6 +49,8 @@ class CameraPreview extends ViewGroup implements SurfaceHolder.Callback {
         mHolder.addCallback(this);
         mHolder.setType(SurfaceHolder.SURFACE_TYPE_PUSH_BUFFERS);
     }
+
+
 
     public void setCamera(Camera camera) {
         if (mCamera == camera) {
@@ -71,6 +76,10 @@ class CameraPreview extends ViewGroup implements SurfaceHolder.Callback {
             // surface. Preview must be started before you can take a picture.
             mCamera.startPreview();
         }
+    }
+
+    public void setFlashOn(boolean flashOn) {
+        this.flashOn = flashOn;
     }
 
     public void surfaceChanged(SurfaceHolder holder, int format, int w, int h) {
@@ -222,7 +231,7 @@ class CameraPreview extends ViewGroup implements SurfaceHolder.Callback {
 
     //Camera actions
 
-    public void switchCamera(Camera camera) {
+    public void switchCamera(Camera camera, Activity activity, int cameraId) {
         if (mCamera == camera) {
             return;
         }
@@ -231,9 +240,10 @@ class CameraPreview extends ViewGroup implements SurfaceHolder.Callback {
         if (mCamera != null) {
             try {
                 mCamera.setPreviewDisplay(mHolder);
-                mCamera.setDisplayOrientation(90);
+                int cameraOrientation = setCameraDisplayOrientation(activity, cameraId, camera);
+                mCamera.setDisplayOrientation(cameraOrientation);
                 Camera.Parameters parameters = mCamera.getParameters();
-                parameters.setRotation(90);
+                parameters.setRotation(cameraOrientation);
                 parameters.setPreviewSize(mPreviewSize.width,mPreviewSize.height);
                 parameters.setPictureSize(mPreviewSize.width, mPreviewSize.height);
                 mCamera.setParameters(parameters);
@@ -243,6 +253,31 @@ class CameraPreview extends ViewGroup implements SurfaceHolder.Callback {
 
             mCamera.startPreview();
         }
+    }
+
+    public static int setCameraDisplayOrientation(Activity activity,
+                                                   int cameraId, android.hardware.Camera camera) {
+        android.hardware.Camera.CameraInfo info =
+                new android.hardware.Camera.CameraInfo();
+        android.hardware.Camera.getCameraInfo(cameraId, info);
+        int rotation = activity.getWindowManager().getDefaultDisplay()
+                .getRotation();
+        int degrees = 0;
+        switch (rotation) {
+            case Surface.ROTATION_0: degrees = 0; break;
+            case Surface.ROTATION_90: degrees = 90; break;
+            case Surface.ROTATION_180: degrees = 180; break;
+            case Surface.ROTATION_270: degrees = 270; break;
+        }
+
+        int result;
+        if (info.facing == Camera.CameraInfo.CAMERA_FACING_FRONT) {
+            result = (info.orientation + degrees) % 360;
+            result = (360 - result) % 360;  // compensate the mirror
+        } else {  // back-facing
+            result = (info.orientation - degrees + 360) % 360;
+        }
+        return result;
     }
 
 

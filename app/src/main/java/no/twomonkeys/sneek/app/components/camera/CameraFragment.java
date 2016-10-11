@@ -4,21 +4,27 @@ import android.app.Fragment;
 import android.app.FragmentTransaction;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
+import android.graphics.Rect;
+import android.graphics.RectF;
 import android.hardware.Camera;
 import android.media.Image;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.v4.content.ContextCompat;
 import android.util.Log;
+import android.view.GestureDetector;
 import android.view.LayoutInflater;
+import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.FrameLayout;
 import android.widget.ImageButton;
 import android.widget.LinearLayout;
 import android.widget.RelativeLayout;
+import android.widget.TextView;
 
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.List;
 
 import no.twomonkeys.sneek.R;
@@ -37,6 +43,8 @@ public class CameraFragment extends Fragment implements CameraEditFragment.Callb
     private ImageButton cameraBtn, selfieBtn, flashBtn;
     private View view;
     private int cameraId;
+    private boolean isSwitchingCamera, flashOn;
+
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
@@ -50,12 +58,105 @@ public class CameraFragment extends Fragment implements CameraEditFragment.Callb
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         view = inflater.inflate(R.layout.camera, container, false);
+
+        view.setOnTouchListener(new View.OnTouchListener() {
+            private GestureDetector gestureDetector = new GestureDetector(getActivity(), new GestureDetector.SimpleOnGestureListener() {
+                @Override
+                public boolean onDoubleTap(MotionEvent e) {
+                    Log.d("TEST", "onDoubleTap");
+                    selfieClick();
+                    return super.onDoubleTap(e);
+                }
+
+                @Override
+                public boolean onSingleTapUp(MotionEvent e) {
+                    tapToFocus(e);
+                    return super.onSingleTapUp(e);
+                }
+                // implement here other callback methods like onFling, onScroll as necessary
+            });
+
+            @Override
+            public boolean onTouch(View v, MotionEvent event) {
+                // Log.d("TEST", "Raw event: " + event.getAction() + ", (" + event.getRawX() + ", " + event.getRawY() + ")");
+                gestureDetector.onTouchEvent(event);
+                return true;
+            }
+        });
+
+
         preview = getPreview();
         bottomBv = getBottomBv();
         cameraBtn = getCameraBtn();
         selfieBtn = getSelfieBtn();
         flashBtn = getFlashBtn();
         return view;
+    }
+
+
+    public void tapToFocus(MotionEvent event) {
+        if (mCamera != null) {
+            Log.v("FOCUSING", "FOCUSING");
+            Camera camera = mCamera;
+            camera.cancelAutoFocus();
+
+
+            float x = event.getX();
+            float y = event.getY();
+
+            Rect touchRect = new Rect(
+                    (int)(x - 100),
+                    (int)(y - 100),
+                    (int)(x + 100),
+                    (int)(y + 100));
+
+
+            final Rect targetFocusRect = new Rect(
+                    touchRect.left * 2000/view.getWidth() - 1000,
+                    touchRect.top * 2000/view.getHeight() - 1000,
+                    touchRect.right * 2000/view.getWidth() - 1000,
+                    touchRect.bottom * 2000/view.getHeight() - 1000);
+
+
+
+
+            Rect focusRect = new Rect(-1000, -1000, 1000, 0);
+            focusRect = targetFocusRect;
+                    //left, top, right, bottm
+           // Rect focusRect = calculateTapArea(event.getX(), event.getY(), 1f);
+            Log.v("the result is", "result it" + event.getX() + " : " + event.getY());
+            Camera.Parameters parameters = camera.getParameters();
+            if (parameters.getFocusMode() != Camera.Parameters.FOCUS_MODE_AUTO) {
+                parameters.setFocusMode(Camera.Parameters.FOCUS_MODE_AUTO);
+            }
+            if (parameters.getMaxNumFocusAreas() > 0) {
+                List<Camera.Area> mylist = new ArrayList<Camera.Area>();
+                mylist.add(new Camera.Area(focusRect, 1000));
+                parameters.setFocusAreas(mylist);
+            }
+
+            try {
+                camera.cancelAutoFocus();
+                camera.setParameters(parameters);
+                camera.startPreview();
+                camera.autoFocus(new Camera.AutoFocusCallback() {
+                    @Override
+                    public void onAutoFocus(boolean success, Camera camera) {
+                        if (camera.getParameters().getFocusMode() != Camera.Parameters.FOCUS_MODE_CONTINUOUS_PICTURE) {
+                            Camera.Parameters parameters = camera.getParameters();
+                            parameters.setFocusMode(Camera.Parameters.FOCUS_MODE_CONTINUOUS_PICTURE);
+                            if (parameters.getMaxNumFocusAreas() > 0) {
+                                parameters.setFocusAreas(null);
+                            }
+                            camera.setParameters(parameters);
+                            camera.startPreview();
+                        }
+                    }
+                });
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
+        }
     }
 
 
@@ -170,15 +271,19 @@ public class CameraFragment extends Fragment implements CameraEditFragment.Callb
 
     private void selfieClick() {
         cameraId = cameraId == 1 ? 0 : 1;
-        Thread flipCamThread = new Thread(new Runnable() {
-            @Override
-            public void run() {
-                if (safeCameraOpen(cameraId)) {
-                    mPreview.switchCamera(mCamera);
+        if (!isSwitchingCamera) {
+            isSwitchingCamera = true;
+            Thread flipCamThread = new Thread(new Runnable() {
+                @Override
+                public void run() {
+                    if (safeCameraOpen(cameraId)) {
+                        mPreview.switchCamera(mCamera, getActivity(), cameraId);
+                        isSwitchingCamera = false;
+                    }
                 }
-            }
-        });
-        flipCamThread.start();
+            });
+            flipCamThread.start();
+        }
     }
 
     private ImageButton getFlashBtn() {
@@ -196,8 +301,12 @@ public class CameraFragment extends Fragment implements CameraEditFragment.Callb
     }
 
     private void flashClick() {
-
-
+        flashOn = !flashOn;
+        if (flashOn) {
+            flashBtn.setImageDrawable(ContextCompat.getDrawable(getActivity(), R.drawable.flashonx3));
+        } else {
+            flashBtn.setImageDrawable(ContextCompat.getDrawable(getActivity(), R.drawable.flashx3));
+        }
     }
 
     //Camera actions
@@ -216,8 +325,35 @@ public class CameraFragment extends Fragment implements CameraEditFragment.Callb
                 replaceFragment(cef);
             }
         };
-
+        turnOnFlash(flashOn);
         mCamera.takePicture(null, null, pictureCallback);
+    }
+
+    public void turnOnFlash(boolean flashOn) {
+        if (hasFlash()) {
+            Camera.Parameters p = mCamera.getParameters();
+
+            p.setFlashMode(flashOn ? Camera.Parameters.FLASH_MODE_ON : Camera.Parameters.FLASH_MODE_OFF);
+            mCamera.setParameters(p);
+        } else {
+            //Implement flash for selfie here
+        }
+    }
+
+    private boolean hasFlash() {
+        Camera.Parameters params = mCamera.getParameters();
+        List<String> flashModes = params.getSupportedFlashModes();
+        if (flashModes == null) {
+            return false;
+        }
+
+        for (String flashMode : flashModes) {
+            if (Camera.Parameters.FLASH_MODE_ON.equals(flashMode)) {
+                return true;
+            }
+        }
+
+        return false;
     }
 
     public void replaceFragment(Fragment someFragment) {

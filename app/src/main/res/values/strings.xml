@@ -1,3 +1,7 @@
 <resources>
     <string name="app_name">sneek</string>
+    <string name="add_caption_txt">Tap to add caption</string>
+    <string name="hour_txt">hour</string>
+    <string name="day_txt">day</string>
+    <string name="week_txt">week</string>
 </resources>

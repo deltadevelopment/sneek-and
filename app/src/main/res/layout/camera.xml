@@ -28,8 +28,9 @@
         <ImageButton
             android:id="@+id/flash_button"
             android:layout_centerVertical="true"
-            android:layout_width="25dp"
-            android:layout_height="25dp"
+            android:layout_width="45dp"
+            android:layout_height="45dp"
+            android:padding="10dp"
             android:src="@drawable/flashx3"
             android:background="@color/transparent"
             android:scaleType="fitCenter"
@@ -56,8 +57,9 @@
         <ImageButton
             android:id="@+id/selfie_button"
             android:layout_centerVertical="true"
-            android:layout_width="30dp"
-            android:layout_height="30dp"
+            android:layout_width="50dp"
+            android:layout_height="50dp"
+            android:padding="10dp"
             android:src="@drawable/selfiex3"
             android:background="@color/transparent"
             android:scaleType="fitCenter"

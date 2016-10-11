@@ -22,7 +22,6 @@ public class MainActivity extends AppCompatActivity {
 
     private ViewPager vpPager;
     private CameraFragment cameraFragment;
-
     static String TAG = "MainActivity";
 
     @Override

@@ -12,13 +12,20 @@
         android:layout_height="match_parent"
         android:scaleType="centerCrop" />
 
+    <!--<android.opengl.GLSurfaceView
+        android:id="@+id/surface_view"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:background="@color/colorPrimary"/>-->
+
     <ImageButton
         android:id="@+id/cancel_btn"
-        android:layout_width="15dp"
-        android:layout_height="15dp"
-        android:layout_marginLeft="20dp"
-        android:layout_marginTop="20dp"
+        android:layout_width="55dp"
+        android:layout_height="55dp"
+        android:layout_marginLeft="0dp"
+        android:layout_marginTop="0dp"
         android:background="@color/transparent"
+        android:padding="20dp"
         android:scaleType="fitCenter"
         android:src="@drawable/exitx3" />
 
@@ -33,42 +40,46 @@
             android:id="@+id/caption_btn"
             android:layout_width="match_parent"
             android:layout_height="50dp"
-            android:layout_marginLeft="10dp"
+            android:layout_marginLeft="15dp"
             android:background="@color/transparent"
             android:gravity="left|center_vertical"
             android:text="Tap to add caption"
+            android:fontFamily="HelveticaNeue"
             android:textAllCaps="false"
-            android:textColor="@color/captionGrey" />
-
+            android:textColor="@color/captionGrey"
+            android:textSize="18sp" />
         <ImageButton
-            android:id="@+id/download_button"
+            android:id="@+id/save_disk_button"
             android:layout_width="25dp"
             android:layout_height="25dp"
             android:layout_alignParentBottom="true"
             android:layout_alignParentLeft="true"
-            android:layout_marginBottom="20dp"
+            android:layout_marginBottom="21dp"
             android:layout_marginLeft="10dp"
             android:background="@color/transparent"
             android:scaleType="fitCenter"
             android:src="@drawable/downloadx3" />
-
         <Button
+            android:id="@+id/expire_btn"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_alignParentBottom="true"
             android:layout_centerHorizontal="true"
-            android:layout_marginBottom="15dp"
+            android:layout_marginBottom="17dp"
+            android:fontFamily="HelveticaNeue"
             android:background="@drawable/rounded_button"
             android:minHeight="30dip"
-            android:minWidth="50dip"
+            android:minWidth="45dip"
+            android:paddingLeft="5dp"
+            android:paddingRight="5dp"
             android:text="1 day"
             android:textAllCaps="false"
             android:textColor="@color/cameraGrey" />
 
         <ImageButton
             android:id="@+id/send_button"
-            android:layout_width="42dp"
-            android:layout_height="42dp"
+            android:layout_width="47dp"
+            android:layout_height="47dp"
             android:layout_alignParentBottom="true"
             android:layout_alignParentRight="true"
             android:layout_marginBottom="10dp"
@@ -85,26 +96,50 @@
         android:background="@color/white"
         android:visibility="invisible">
         <ImageButton
+            android:id="@+id/cancel_caption"
             android:layout_width="20dp"
             android:layout_height="20dp"
-            android:src="@drawable/backx3"
-            android:layout_marginTop="10dp"
             android:layout_marginLeft="10dp"
+            android:layout_marginTop="20dp"
             android:background="@color/transparent"
             android:scaleType="fitCenter"
-            android:id="@+id/cancel_caption"/>
+            android:src="@drawable/backx3" />
+
         <EditText
             android:id="@+id/edit_text"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:textSize="15dp"
             android:layout_marginLeft="15dp"
-            android:layout_marginTop="40dp"
-            android:hint="One year later..."
-            android:textCursorDrawable="@drawable/color_cursor"
+            android:layout_marginTop="50dp"
             android:background="@null"
+            android:hint="One year later..."
+            android:fontFamily="HelveticaNeue"
+            android:maxLength="80"
             android:textColor="@color/captionGrey"
             android:textColorHint="@color/captionGrey"
-            android:maxLength="80"/>
+            android:textCursorDrawable="@drawable/color_cursor"
+            android:textSize="18sp" />
     </RelativeLayout>
+
+    <LinearLayout
+        android:id="@+id/progress_layout"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:background="@color/blackColor"
+        android:gravity="center"
+        android:orientation="vertical"
+        android:visibility="invisible">
+
+        <ProgressBar
+            android:layout_width="30dp"
+            android:layout_height="30dp" />
+
+        <TextView
+            android:id="@+id/progress_text"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Saving..."
+            android:textAlignment="center" />
+    </LinearLayout>
+
 </RelativeLayout>
