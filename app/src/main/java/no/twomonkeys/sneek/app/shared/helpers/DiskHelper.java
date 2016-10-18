@@ -1,26 +1,18 @@
 package no.twomonkeys.sneek.app.shared.helpers;
 
-import android.app.Activity;
 import android.content.ContentResolver;
 import android.content.ContentUris;
 import android.content.ContentValues;
-import android.content.Intent;
 import android.graphics.Bitmap;
 import android.graphics.Matrix;
 import android.net.Uri;
-import android.os.Environment;
 import android.provider.MediaStore;
-import android.util.Log;
 
-import java.io.File;
 import java.io.FileNotFoundException;
-import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.OutputStream;
-import java.text.SimpleDateFormat;
-import java.util.Date;
 
-import no.twomonkeys.sneek.app.shared.SimpleCallback;
+import no.twomonkeys.sneek.app.shared.NetworkCallback;
 
 /**
  * Created by simenlie on 06.10.2016.
@@ -37,7 +29,7 @@ public class DiskHelper {
     public static final String insertImage(ContentResolver cr,
                                            Bitmap source,
                                            String title,
-                                           String description, SimpleCallback scb) {
+                                           String description, NetworkCallback scb) {
 
         ContentValues values = new ContentValues();
         values.put(MediaStore.Images.Media.TITLE, title);
@@ -67,7 +59,7 @@ public class DiskHelper {
                 Bitmap miniThumb = MediaStore.Images.Thumbnails.getThumbnail(cr, id, MediaStore.Images.Thumbnails.MINI_KIND, null);
                 // This is for backward compatibility.
                 storeThumbnail(cr, miniThumb, id, 50F, 50F, MediaStore.Images.Thumbnails.MICRO_KIND);
-                scb.callbackCall(null);
+                scb.exec(null);
             } else {
                 cr.delete(url, null, null);
                 url = null;

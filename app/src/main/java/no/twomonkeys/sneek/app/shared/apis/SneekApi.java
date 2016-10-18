@@ -25,6 +25,11 @@ import retrofit2.http.Url;
 
 public interface SneekApi {
 
+
+    // Feed
+    @GET("v1/feed/following")
+    Call<ResponseModel> getFeedFollowing();
+
     // Followings
     @GET("v1/following")
     Call<ResponseModel> getFollowing();

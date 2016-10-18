@@ -1,12 +1,10 @@
 package no.twomonkeys.sneek.app.shared.models;
 
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.Map;
 
 import no.twomonkeys.sneek.app.shared.MapCallback;
-import no.twomonkeys.sneek.app.shared.SimpleCallback;
-import no.twomonkeys.sneek.app.shared.helpers.DataHelper;
+import no.twomonkeys.sneek.app.shared.NetworkCallback;
 import no.twomonkeys.sneek.app.shared.helpers.GenericContract;
 import no.twomonkeys.sneek.app.shared.helpers.NetworkHelper;
 import no.twomonkeys.sneek.app.shared.interfaces.ArrayCallback;
@@ -48,9 +46,9 @@ public class FollowingModel extends CRUDModel {
                         }
                     }
                 },
-                new SimpleCallback() {
+                new NetworkCallback() {
                     @Override
-                    public void callbackCall(ErrorModel errorModel) {
+                    public void exec(ErrorModel errorModel) {
 
                         arrayCallback.exec(followings, errorModel);
                     }

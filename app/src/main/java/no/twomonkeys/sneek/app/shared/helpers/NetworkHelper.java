@@ -1,23 +1,19 @@
 package no.twomonkeys.sneek.app.shared.helpers;
 
-import android.net.Uri;
 import android.util.Log;
 
 import com.google.gson.Gson;
 import com.google.gson.reflect.TypeToken;
 
-import java.io.File;
 import java.io.IOException;
 import java.util.HashMap;
 import java.util.Map;
 
 import no.twomonkeys.sneek.app.shared.MapCallback;
-import no.twomonkeys.sneek.app.shared.SimpleCallback;
+import no.twomonkeys.sneek.app.shared.NetworkCallback;
 import no.twomonkeys.sneek.app.shared.apis.SneekApi;
 import no.twomonkeys.sneek.app.shared.models.ErrorModel;
 import no.twomonkeys.sneek.app.shared.models.ResponseModel;
-import okhttp3.MediaType;
-import okhttp3.RequestBody;
 import okhttp3.ResponseBody;
 import retrofit2.Call;
 import retrofit2.Callback;
@@ -29,7 +25,7 @@ public class NetworkHelper {
     private static String auth_token;
     private static SneekApi networkService;
 
-    public static void sendRequest(Call<ResponseModel> call, final Contract contract, final MapCallback mcb, final SimpleCallback scb) {
+    public static void sendRequest(Call<ResponseModel> call, final Contract contract, final MapCallback mcb, final NetworkCallback scb) {
         call.enqueue(new Callback<ResponseModel>() {
             @Override
             public void onResponse(Call<ResponseModel> call, Response<ResponseModel> response) {
@@ -52,17 +48,17 @@ public class NetworkHelper {
     {
         // TODO: When implementing login replace this
         // String authToken = DataHelper.getAuthToken();
-        String authToken = "f383f4ad296fd296a8d955f389774492";
+        String authToken = "d389085148bfd1678041e634e12638ca";
         if (authToken != auth_token)
         {
             auth_token = authToken;
-            networkService = ServiceGenerator.createService(SneekApi.class, DataHelper.getAuthToken());
+            networkService = ServiceGenerator.createService(SneekApi.class, "d389085148bfd1678041e634e12638ca");
         }
 
         return networkService;
     }
 
-    public static void handleError(Response<ResponseModel> response, final SimpleCallback scb) {
+    public static void handleError(Response<ResponseModel> response, final NetworkCallback scb) {
         ResponseModel responseModel = response.body();
         ResponseBody errorData = response.errorBody();
         ErrorModel errorModel;
@@ -78,13 +74,13 @@ public class NetworkHelper {
         if (responseModel != null && responseModel.success) {
             //Success
             Log.v(TAG, "SUCESS " + responseModel.data);
-            scb.callbackCall(null);
+            scb.exec(null);
         } else {
             if (errorData == null) {
                 HashMap<String, String> data = new HashMap<>();
                 data.put("message_id", "generic_error");
                 errorModel = new ErrorModel(DataHelper.getContext(), data);
-                scb.callbackCall(errorModel);
+                scb.exec(errorModel);
             } else {
                 try {
                     Map<String, Object> retMap = new Gson().fromJson(errorData.string(), new TypeToken<HashMap<String, Object>>() {
@@ -97,7 +93,7 @@ public class NetworkHelper {
                         withData.put("data", retMap);
                     }
                     errorModel = new ErrorModel(DataHelper.getContext(), withData);
-                    scb.callbackCall(errorModel);
+                    scb.exec(errorModel);
                 } catch (IOException e) {
                     e.printStackTrace();
                 }

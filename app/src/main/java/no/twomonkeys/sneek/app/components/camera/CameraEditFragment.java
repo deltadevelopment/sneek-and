@@ -1,28 +1,17 @@
 package no.twomonkeys.sneek.app.components.camera;
 
-import android.animation.Animator;
-import android.animation.TimeInterpolator;
 import android.app.Fragment;
-import android.app.ProgressDialog;
-import android.content.ContentResolver;
-import android.content.Context;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
-import android.net.Uri;
-import android.opengl.GLSurfaceView;
 import android.os.Bundle;
-import android.os.Environment;
-import android.os.Handler;
-import android.provider.MediaStore;
 import android.support.annotation.Nullable;
 import android.support.v4.content.ContextCompat;
+import android.text.Editable;
+import android.text.TextWatcher;
 import android.util.Log;
-import android.view.GestureDetector;
 import android.view.LayoutInflater;
-import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewGroup;
-import android.view.inputmethod.EditorInfo;
 import android.view.inputmethod.InputMethodManager;
 import android.widget.Button;
 import android.widget.EditText;
@@ -32,37 +21,18 @@ import android.widget.LinearLayout;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
 
-import org.w3c.dom.Text;
-
-import java.io.ByteArrayOutputStream;
-import java.io.File;
 import java.util.Timer;
 import java.util.TimerTask;
 
 import jp.co.cyberagent.android.gpuimage.GPUImage;
-import jp.co.cyberagent.android.gpuimage.GPUImageBoxBlurFilter;
 import jp.co.cyberagent.android.gpuimage.GPUImageContrastFilter;
 import jp.co.cyberagent.android.gpuimage.GPUImageFilter;
 import jp.co.cyberagent.android.gpuimage.GPUImageFilterGroup;
-import jp.co.cyberagent.android.gpuimage.GPUImageGrayscaleFilter;
-import jp.co.cyberagent.android.gpuimage.GPUImageSepiaFilter;
 import no.twomonkeys.sneek.R;
-import no.twomonkeys.sneek.app.components.filters.IFAmaroFilter;
 import no.twomonkeys.sneek.app.components.filters.IFBrannanFilter;
-import no.twomonkeys.sneek.app.components.filters.IFEarlybirdFilter;
-import no.twomonkeys.sneek.app.components.filters.IFHefeFilter;
-import no.twomonkeys.sneek.app.components.filters.IFHudsonFilter;
 import no.twomonkeys.sneek.app.components.filters.IFInkwellFilter;
-import no.twomonkeys.sneek.app.components.filters.IFLomofiFilter;
-import no.twomonkeys.sneek.app.components.filters.IFLordKelvinFilter;
-import no.twomonkeys.sneek.app.components.filters.IFNashvilleFilter;
-import no.twomonkeys.sneek.app.components.filters.IFRiseFilter;
-import no.twomonkeys.sneek.app.components.filters.IFSierraFilter;
-import no.twomonkeys.sneek.app.components.filters.IFSutroFilter;
-import no.twomonkeys.sneek.app.components.filters.IFToasterFilter;
-import no.twomonkeys.sneek.app.components.filters.IFValenciaFilter;
 import no.twomonkeys.sneek.app.components.filters.IFWaldenFilter;
-import no.twomonkeys.sneek.app.shared.SimpleCallback;
+import no.twomonkeys.sneek.app.shared.NetworkCallback;
 import no.twomonkeys.sneek.app.shared.helpers.DiskHelper;
 import no.twomonkeys.sneek.app.shared.helpers.GraphicsHelper;
 import no.twomonkeys.sneek.app.shared.helpers.UIHelper;
@@ -318,9 +288,9 @@ public class CameraEditFragment extends Fragment {
         progressLayout.setVisibility(View.INVISIBLE);
         progressTxtView.setText("Saving...");
         progressLayout.setVisibility(View.VISIBLE);
-        DiskHelper.insertImage(getActivity().getContentResolver(), photoTaken, "sneek-img", "taken from sneek app", new SimpleCallback() {
+        DiskHelper.insertImage(getActivity().getContentResolver(), photoTaken, "sneek-img", "taken from sneek app", new NetworkCallback() {
             @Override
-            public void callbackCall(ErrorModel errorModel) {
+            public void exec(ErrorModel errorModel) {
                 Log.v("Stored", "stored");
                 progressTxtView.setText("Saved!");
                 progressLayout.animate().
@@ -383,7 +353,21 @@ public class CameraEditFragment extends Fragment {
 
     public EditText getEditText() {
         if (this.editText == null) {
-            EditText editText = (EditText) view.findViewById(R.id.edit_text);
+            final EditText editText = (EditText) view.findViewById(R.id.edit_text);
+            editText.addTextChangedListener(new TextWatcher() {
+                @Override
+                public void beforeTextChanged(CharSequence charSequence, int i, int i2, int i3) { }
+                @Override
+                public void onTextChanged(CharSequence charSequence, int i, int i2, int i3) { }
+
+                @Override
+                public void afterTextChanged(Editable editable) {
+                    if (null != editText.getLayout() && editText.getLayout().getLineCount() > 2) {
+                        editText.getText().delete(editText.getText().length() - 1, editText.getText().length());
+                    }
+                }
+            });
+
             this.editText = editText;
         }
         return this.editText;

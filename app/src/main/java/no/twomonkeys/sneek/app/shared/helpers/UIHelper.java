@@ -1,10 +1,14 @@
 package no.twomonkeys.sneek.app.shared.helpers;
 
 import android.content.Context;
+import android.graphics.Point;
+import android.graphics.Rect;
 import android.util.DisplayMetrics;
 import android.util.Log;
 import android.view.Display;
 import android.view.WindowManager;
+
+import no.twomonkeys.sneek.app.components.MainActivity;
 
 /**
  * Created by simenlie on 04.10.2016.
@@ -36,5 +40,156 @@ public class UIHelper {
         return (int) result;
     }
 
+    static public Size getOptimalSize(Context context, int width, int height) {
+        Size size;
+        if (width != 0) {
+            size = new Size(width, height);
+        } else {
+            int maxWidth = UIHelper.screenWidth(context);
+            double maxHeight = maxWidth * 1.333333;
+            size = new Size(maxWidth, (int) maxHeight);
+        }
+
+        return UIHelper.sizeForBigStory(context, size);
+    }
+
+    public static Size sizeForBigStory(Context context, Size size) {
+        if (size.width < size.height) {
+            if (size.height > UIHelper.screenHeight(context)) {
+                float percentageBigger = (UIHelper.screenHeight(context) / size.height);
+                float scale = (size.height / percentageBigger) / size.height;
+                size = new Size(size.width / scale,size.height / scale);
+            }
+            else{
+                float percentageBigger =  size.height / (UIHelper.screenHeight(context));
+                float scale = (UIHelper.screenHeight(context) / percentageBigger) / UIHelper.screenHeight(context);
+                size = new Size(size.width * scale,size.height * scale);
+                Log.v("Final size","final size" + size.width + " : " +  size.height + " : " + scale + " : " + percentageBigger);
+            }
+        } else {
+            if (size.width > UIHelper.screenWidth(context)) {
+                float percentageBigger = (UIHelper.screenWidth(context) / size.width);
+                float scale = (size.width / percentageBigger) / size.width;
+                size = new Size(size.width / scale, size.height / scale);
+            }
+            else{
+                float percentageBigger =  size.width /(UIHelper.screenWidth(context));
+                float scale = (size.width / percentageBigger) / size.width;
+                size = new Size(size.width * scale, size.height * scale);
+            }
+        }
+
+        float padding = 5;
+
+        if (size.width > UIHelper.screenWidth(context)) {
+            float percentage = UIHelper.screenWidth(context) / size.width;
+            size.height = (int) (size.height * percentage);
+            size.width = UIHelper.screenWidth(context);
+        }
+        float width = (int) (size.width / 1.8);
+        float height = (int) (size.height / 1.8);
+
+        //Padding is 5, find how much 5 pixel from the width is in height
+        float percentageOfWidth = (padding / width) * 100;
+        float heightPixels = (height * percentageOfWidth) / 100;
+
+        //the finished max height and width
+        float resultWidth = width - padding;
+        float resultheight = height - heightPixels;
+
+        return new Size((int) resultWidth, (int) resultheight);
+
+    }
+
+    static public int dpToPx(Context c, int dp) {
+        final float scale = c.getResources().getDisplayMetrics().density;
+        int pixels = (int) (dp * scale + 0.5f);
+        return pixels;
+    }
+
+    public static float[] cornersForType(boolean rightAlignment, PostArtifacts artifacts) {
+        //topleft, topright, bottomright, bottomLeft
+
+        float spinoff = UIHelper.dpToPx(MainActivity.mActivity, 60);
+
+        float rounded = UIHelper.dpToPx(MainActivity.mActivity, 10);
+        float notRounded = UIHelper.dpToPx(MainActivity.mActivity, 2);
+        float[] rectCorners;
+
+        if (rightAlignment) {
+            if (artifacts.sameUserNext && !artifacts.sameUserPrevious) {
+                rectCorners = new float[]{rounded, rounded, notRounded, rounded};
+            } else if (artifacts.sameUserNext && artifacts.sameUserPrevious) {
+                if (artifacts.isLastInDay) {
+                    if (!artifacts.isSameDay) {
+                        //rectCorners = (UIRectCornerTopLeft | UIRectCornerBottomLeft | UIRectCornerBottomRight | UIRectCornerTopRight);
+                        rectCorners = new float[]{rounded, rounded, rounded, rounded};
+                    } else {
+                        //rectCorners = (UIRectCornerTopLeft | UIRectCornerBottomLeft | UIRectCornerBottomRight);
+                        rectCorners = new float[]{rounded, notRounded, rounded, rounded};
+                    }
+                } else {
+                    if (!artifacts.isSameDay) {
+                        //rectCorners = (UIRectCornerTopLeft | UIRectCornerBottomLeft | UIRectCornerTopRight);
+                        rectCorners = new float[]{rounded, rounded, notRounded, rounded};
+                    } else {
+                        //rectCorners = (UIRectCornerTopLeft | UIRectCornerBottomLeft);
+                        rectCorners = new float[]{rounded, notRounded, notRounded, rounded};
+                    }
+                }
+            } else if (!artifacts.sameUserNext && artifacts.sameUserPrevious) {
+                if (!artifacts.isSameDay) {
+                    //rectCorners = (UIRectCornerTopLeft | UIRectCornerBottomLeft | UIRectCornerBottomRight | UIRectCornerTopRight);
+                    rectCorners = new float[]{rounded, rounded, rounded, rounded};
+                } else {
+                    //rectCorners = (UIRectCornerTopLeft | UIRectCornerBottomLeft | UIRectCornerBottomRight);
+                    rectCorners = new float[]{rounded, notRounded, rounded, rounded};
+                }
+            } else {
+                //rectCorners = (UIRectCornerTopLeft | UIRectCornerBottomLeft | UIRectCornerBottomRight | UIRectCornerTopRight);
+                rectCorners = new float[]{rounded, rounded, rounded, rounded};
+            }
+        } else {
+            //HERE GOES ALL
+            //topleft, topright, bottomright, bottomLeft
+            if (artifacts.sameUserNext && !artifacts.sameUserPrevious) {
+                // rectCorners = (UIRectCornerTopLeft | UIRectCornerBottomRight | UIRectCornerTopRight);
+                rectCorners = new float[]{rounded, rounded, rounded, notRounded};
+            } else if (artifacts.sameUserNext && artifacts.sameUserPrevious) {
+                if (artifacts.isLastInDay) {
+                    if (!artifacts.isSameDay) {
+                        // rectCorners = (UIRectCornerTopLeft | UIRectCornerBottomLeft | UIRectCornerBottomRight | UIRectCornerTopRight);
+                        rectCorners = new float[]{rounded, rounded, rounded, rounded};
+                    } else {
+                        //rectCorners = (UIRectCornerTopRight | UIRectCornerBottomLeft | UIRectCornerBottomRight);
+                        rectCorners = new float[]{notRounded, rounded, rounded, rounded};
+                    }
+                } else {
+                    if (!artifacts.isSameDay) {
+                        //rectCorners = (UIRectCornerTopLeft | UIRectCornerBottomRight | UIRectCornerTopRight);
+                        rectCorners = new float[]{rounded, rounded, rounded, notRounded};
+                    } else {
+                        // rectCorners = (UIRectCornerTopRight | UIRectCornerBottomRight);
+                        rectCorners = new float[]{notRounded, rounded, rounded, notRounded};
+                    }
+                }
+            }
+            //topleft, topright, bottomright, bottomLeft
+            else if (!artifacts.sameUserNext && artifacts.sameUserPrevious) {
+                if (!artifacts.isSameDay) {
+                    //rectCorners = (UIRectCornerTopLeft | UIRectCornerBottomLeft | UIRectCornerBottomRight | UIRectCornerTopRight);
+                    rectCorners = new float[]{rounded, rounded, rounded, rounded};
+                } else {
+                    //rectCorners = (UIRectCornerTopRight | UIRectCornerBottomLeft | UIRectCornerBottomRight);
+                    rectCorners = new float[]{notRounded, rounded, rounded, rounded};
+                }
+
+            } else {
+                //rectCorners = (UIRectCornerTopLeft | UIRectCornerBottomLeft | UIRectCornerBottomRight | UIRectCornerTopRight);
+                rectCorners = new float[]{rounded, rounded, rounded, rounded};
+            }
+        }
+        return rectCorners;
+    }
 
 }

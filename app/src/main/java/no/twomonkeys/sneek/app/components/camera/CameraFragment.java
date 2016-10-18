@@ -100,7 +100,6 @@ public class CameraFragment extends Fragment implements CameraEditFragment.Callb
             Camera camera = mCamera;
             camera.cancelAutoFocus();
 
-
             float x = event.getX();
             float y = event.getY();
 
@@ -110,15 +109,11 @@ public class CameraFragment extends Fragment implements CameraEditFragment.Callb
                     (int)(x + 100),
                     (int)(y + 100));
 
-
             final Rect targetFocusRect = new Rect(
                     touchRect.left * 2000/view.getWidth() - 1000,
                     touchRect.top * 2000/view.getHeight() - 1000,
                     touchRect.right * 2000/view.getWidth() - 1000,
                     touchRect.bottom * 2000/view.getHeight() - 1000);
-
-
-
 
             Rect focusRect = new Rect(-1000, -1000, 1000, 0);
             focusRect = targetFocusRect;

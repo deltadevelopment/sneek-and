@@ -1,5 +1,7 @@
 package no.twomonkeys.sneek.app.shared.helpers;
 
+import android.util.Log;
+
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map;
@@ -34,18 +36,10 @@ public class GenericContract {
         return new Contract() {
             @Override
             public Map generic_contract(Map map) {
-                ArrayList streamsRaw = (ArrayList) map.get("streams");
-                ArrayList storiesRaw = (ArrayList) map.get("stories");
-
-                for (Object stream : streamsRaw) {
-                    storiesRaw.add(stream);
-                }
-
-                HashMap<String, Object> returnMap = new HashMap<>();
-                returnMap.put("stories", storiesRaw);
+                Log.v("Fetched map ","map fetched: " + map);
 
 
-                return returnMap;
+                return map;
             }
         };
     }

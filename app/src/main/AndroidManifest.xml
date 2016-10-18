@@ -19,7 +19,7 @@
         android:icon="@mipmap/ic_launcher"
         android:label="@string/app_name"
         android:supportsRtl="true"
-        android:theme="@style/Theme.AppCompat.NoActionBar" >
+        android:theme="@style/AppTheme" >
         <activity android:name="no.twomonkeys.sneek.app.components.MainActivity"
             android:screenOrientation="portrait"
             android:windowSoftInputMode="adjustNothing">
@@ -30,5 +30,7 @@
             </intent-filter>
         </activity>
     </application>
-
+<!--
+Theme.AppCompat.NoActionBar
+-->
 </manifest>

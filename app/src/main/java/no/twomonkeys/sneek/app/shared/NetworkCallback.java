@@ -7,6 +7,6 @@ import no.twomonkeys.sneek.app.shared.models.ErrorModel;
  * Copyright 2MONKEYS AS
  */
 
-public interface SimpleCallback {
-    void callbackCall(ErrorModel errorModel);
+public interface NetworkCallback {
+    void exec(ErrorModel errorModel);
 }

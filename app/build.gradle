@@ -36,6 +36,6 @@ dependencies {
 
     compile 'com.android.support:recyclerview-v7:+'
     compile 'jp.co.cyberagent.android.gpuimage:gpuimage-library:1.4.1'
-
+    compile 'com.github.orangegangsters:swipy:1.2.3@aar'
     compile 'com.facebook.fresco:fresco:0.10.0'
 }

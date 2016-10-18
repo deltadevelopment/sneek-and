@@ -9,7 +9,7 @@ import java.util.Date;
 import java.util.TimeZone;
 
 /**
- * 26/09/16 by chridal
+ * 26/09/16 by simenlie
  * Copyright 2MONKEYS AS
  */
 
@@ -40,13 +40,76 @@ public class DateHelper {
         return false;
     }
 
-    public static boolean dateLaterThan(Date date, int seconds)
-    {
+    public static boolean dateLaterThan(Date date, int seconds) {
         Date dateNow = new Date();
-        long secondsDiff = (dateNow.getTime()-date.getTime())/1000;
-        Log.v("DIFF is","DIFF " + secondsDiff);
+        long secondsDiff = (dateNow.getTime() - date.getTime()) / 1000;
+        Log.v("DIFF is", "DIFF " + secondsDiff);
         return true;
     }
+
+    public static String shortTime(String dateString) {
+        String finalString = "00.00";
+        SimpleDateFormat formatter = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSS'Z'");
+        formatter.setTimeZone(TimeZone.getTimeZone("UTC"));
+        try {
+            Date dateFromString = formatter.parse(dateString);
+            Calendar calendar = Calendar.getInstance();
+            calendar.setTime(dateFromString);
+            int hours = calendar.get(Calendar.HOUR_OF_DAY);
+            int minutes = calendar.get(Calendar.MINUTE);
+            int seconds = calendar.get(Calendar.SECOND);
+            String hoursString = hours < 10 ? "0" + hours : hours + "";
+            String minuteString = minutes < 10 ? "0" + minutes : minutes + "";
+            finalString = hoursString + "." + minuteString;
+        } catch (ParseException e) {
+            e.printStackTrace();
+        }
+
+        return finalString;
+    }
+
+    public static String dateNowInString() {
+
+        SimpleDateFormat formatter = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSS'Z'");
+        formatter.setTimeZone(TimeZone.getTimeZone("UTC"));
+        return formatter.format(new Date());
+    }
+
+    public static boolean isSameTimeWithDates(Date dateOne, Date dateTwo) {
+
+        long difference = dateOne.getTime() - dateTwo.getTime();
+        long seconds = difference / 1000;
+        long minutes = seconds / 60;
+       // Log.v("MIn","minutes is " + minutes + " " + dateOne.toString()+ " " + dateTwo.toString());
+        if (minutes > 5) {
+            return false;
+        }
+        return true;
+    }
+
+
+    public static Date dateForString(String dateString) {
+        SimpleDateFormat formatter = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSS'Z'");
+        formatter.setTimeZone(TimeZone.getTimeZone("UTC"));
+        try {
+            return formatter.parse(dateString);
+        } catch (ParseException e) {
+            e.printStackTrace();
+        }
+        return null;
+    }
+
+    public static boolean isSameDayWithDates(Date dateOne, Date dateTwo) {
+        Calendar cal1 = Calendar.getInstance();
+        Calendar cal2 = Calendar.getInstance();
+        cal1.setTime(dateOne);
+        cal2.setTime(dateTwo);
+        boolean sameDay = cal1.get(Calendar.YEAR) == cal2.get(Calendar.YEAR) &&
+                cal1.get(Calendar.DAY_OF_YEAR) == cal2.get(Calendar.DAY_OF_YEAR);
+
+        return sameDay;
+    }
+
 
 
     public static String shortTimeSince(String date) {

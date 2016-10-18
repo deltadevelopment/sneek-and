@@ -13,6 +13,9 @@
     <color name="captionGrey">#B2B2B2</color>
     <color name="themeColor">#FC476F</color>
     <color name="blackColor">#000000</color>
+    <color name="usernameGrey">#ADADAD</color>
+    <color name="createdAtGrey">#ADADAD</color>
+
 
 
 </resources>
