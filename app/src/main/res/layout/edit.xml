@@ -1,0 +1,91 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/editRl"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:background="@color/editBgGrey"
+    tools:context="no.twomonkeys.sneek.app.components.MainActivity">
+
+    <View
+        android:layout_width="match_parent"
+        android:layout_height="5dp"
+        android:background="@drawable/custom_shape"></View>
+    <RelativeLayout
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content">
+        <EditText
+            android:id="@+id/editEt"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_centerVertical="true"
+            android:layout_marginLeft="10dp"
+            android:layout_marginRight="50dp"
+            android:layout_weight="1"
+            android:background="@null"
+            android:fontFamily="sans-serif"
+            android:hint="@string/edit_hint"
+            android:inputType="textMultiLine"
+            android:lineSpacingMultiplier="5"
+            android:maxLines="5"
+            android:paddingBottom="0dp"
+            android:textColor="@color/blackColor"
+            android:textColorHint="@color/captionGrey"
+            android:textSize="17sp"
+            android:textStyle="bold" />
+
+        <ImageButton
+            android:id="@+id/editCameraBtn"
+            android:layout_width="50dp"
+            android:layout_height="wrap_content"
+            android:layout_alignParentRight="true"
+            android:background="@color/transparent"
+            android:paddingBottom="10dp"
+            android:paddingLeft="10dp"
+            android:paddingRight="10dp"
+            android:paddingTop="10dp"
+            android:scaleType="fitCenter"
+            android:src="@drawable/camerax3" />
+    </RelativeLayout>
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="40dp"
+        android:id="@+id/toolbarLl"
+        android:layout_alignParentBottom="true"
+        android:background="@color/transparent"
+        android:visibility="gone"
+        android:orientation="horizontal">
+        <TextView
+            android:layout_width="40dp"
+            android:layout_height="40dp"
+            android:textAlignment="center"
+            android:gravity="center"
+            android:textSize="23sp"
+            android:layout_marginRight="20dp"
+            android:textStyle="normal"
+            android:textColor="@color/themeColor"
+            android:text="Aa"/>
+        <ImageButton
+            android:layout_width="40dp"
+            android:layout_height="40dp"
+            android:scaleType="fitCenter"
+            android:padding="5dp"
+            android:background="@null"
+            android:layout_marginRight="23dp"
+            android:src="@drawable/camera23x" />
+        <Button
+            android:id="@+id/editExpireBtn"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:fontFamily="HelveticaNeue"
+            android:background="@drawable/rounded_button2"
+            android:minHeight="25dip"
+            android:minWidth="40dip"
+            android:text="24H"
+            android:layout_marginTop="-4dp"
+            android:textAllCaps="false"
+            android:textColor="@color/toolbarGrey" />
+    </LinearLayout>
+</RelativeLayout>

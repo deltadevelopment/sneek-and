@@ -86,8 +86,8 @@ public class UIHelper {
             size.height = (int) (size.height * percentage);
             size.width = UIHelper.screenWidth(context);
         }
-        float width = (int) (size.width / 1.8);
-        float height = (int) (size.height / 1.8);
+        float width = (int) (size.width / 1.9);
+        float height = (int) (size.height / 1.9);
 
         //Padding is 5, find how much 5 pixel from the width is in height
         float percentageOfWidth = (padding / width) * 100;
