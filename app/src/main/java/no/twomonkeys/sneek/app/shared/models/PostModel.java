@@ -1,7 +1,9 @@
 package no.twomonkeys.sneek.app.shared.models;
 
+import android.app.Activity;
 import android.graphics.drawable.Animatable;
 import android.net.Uri;
+import android.os.Environment;
 import android.support.annotation.Nullable;
 import android.util.Log;
 
@@ -14,11 +16,14 @@ import com.facebook.drawee.view.SimpleDraweeView;
 import com.facebook.imagepipeline.image.ImageInfo;
 import com.facebook.imagepipeline.image.QualityInfo;
 
+import java.io.File;
+import java.io.IOException;
 import java.util.Map;
 
 import no.twomonkeys.sneek.app.components.MainActivity;
 import no.twomonkeys.sneek.app.shared.SimpleCallback2;
 import no.twomonkeys.sneek.app.shared.helpers.DataHelper;
+import no.twomonkeys.sneek.app.shared.helpers.MediaManager;
 import no.twomonkeys.sneek.app.shared.helpers.PostArtifacts;
 import no.twomonkeys.sneek.app.shared.helpers.Size;
 import no.twomonkeys.sneek.app.shared.helpers.UIHelper;
@@ -36,6 +41,10 @@ public class PostModel extends CRUDModel {
     public PostArtifacts postArtifacts;
     float cellHeight;
     Size size;
+
+    public interface AsyncCallback {
+        void fileRetrieved(File file);
+    }
 
     public PostModel(Map map) {
         build(map);
@@ -119,7 +128,64 @@ public class PostModel extends CRUDModel {
                 .setControllerListener(controllerListener)
                 .build();
         sdv.setController(controller);
+    }
 
+    public boolean hasCachedVideo() {
+        String filename = media_key + ".mp4";
+
+        File path = Environment.getExternalStoragePublicDirectory(
+                Environment.DIRECTORY_MOVIES);
+        File file = new File(path, "/" + filename);
+
+        if (file.exists()) {
+            if (file.length() == 0) {
+                return false;
+            }
+            return true;
+        } else {
+            return false;
+        }
+    }
+
+    public File getVideoFile() {
+        String filename = media_key + ".mp4";
+
+        File path = Environment.getExternalStoragePublicDirectory(
+                Environment.DIRECTORY_MOVIES);
+        File file = new File(path, "/" + filename);
+        return file;
+    }
+
+    //video
+    public void fetchVideo(final Activity activity, final AsyncCallback acb) {
+        final File videoFile = getVideoFile();
+        if (hasCachedVideo()) {
+            acb.fileRetrieved(videoFile);
+            System.out.println("IS CACHED " + videoFile.length());
+        } else {
+
+            try {
+                videoFile.createNewFile();
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+            System.out.println("Donwload using stream");
+
+            MediaManager.downloadVideoAsync(getMedia_url(), videoFile, new SimpleCallback2() {
+                @Override
+                public void callbackCall() {
+                    activity.runOnUiThread(new Runnable() {
+                        @Override
+                        public void run() {
+                            acb.fileRetrieved(videoFile);
+                        }
+                    });
+
+                }
+            });
+
+
+        }
     }
 
 

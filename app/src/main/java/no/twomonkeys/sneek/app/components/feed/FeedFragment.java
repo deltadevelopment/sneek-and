@@ -37,7 +37,7 @@ import no.twomonkeys.sneek.app.shared.models.FeedModel;
  * Created by simenlie on 13.10.2016.
  */
 
-public class FeedFragment extends Fragment implements EditView.Callback {
+public class FeedFragment extends Fragment implements EditView.Callback, KeyboardUtil.Callback {
 
     private RecyclerView fRecyclerView;
     private RecyclerView.Adapter fAdapter;
@@ -66,148 +66,84 @@ public class FeedFragment extends Fragment implements EditView.Callback {
                              Bundle savedInstanceState) {
         view = inflater.inflate(R.layout.feed, container, false);
         feedLl = (RelativeLayout) view.findViewById(R.id.feed);
-        fRecyclerView = (RecyclerView) view.findViewById(R.id.feed_recycler_view);
+
+        mLayoutManager = getmLayoutManager();
+        fRecyclerView = getfRecyclerView();
         swipyRefreshLayout = getSwipyRefreshLayout();
-        mLayoutManager = new LinearLayoutManager(getActivity());
-        mLayoutManager.setReverseLayout(true);
-        mLayoutManager.setStackFromEnd(true);
-        // getActivity().getWindow().setSoftInputMode(WindowManager.LayoutParams.SOFT_INPUT_ADJUST_PAN);
-        editView = (EditView) view.findViewById(R.id.editView);
-        editView.addCallback(this);
+        editView = getEditView();
+        KeyboardUtil keyboardUtil = getKeyboardUtil();
 
-        fRecyclerView.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-
-            }
-        });
-        fRecyclerView.addOnItemTouchListener(new RecyclerView.OnItemTouchListener() {
-            @Override
-            public boolean onInterceptTouchEvent(RecyclerView rv, MotionEvent e) {
-                if (keyboardIsActive) {
-                    System.out.println("CLICKED");
-                    editView.editModeEnded();
-                    InputMethodManager imm = (InputMethodManager) getActivity().getSystemService(Context.INPUT_METHOD_SERVICE);
-                    imm.hideSoftInputFromWindow(editView.editEt.getWindowToken(), 0);
-                    RelativeLayout.LayoutParams l = (RelativeLayout.LayoutParams) swipyRefreshLayout.getLayoutParams();
-                    l.setMargins(0, 0, 0, UIHelper.dpToPx(getContext(), 50));
-                    RelativeLayout.LayoutParams layoutParams = new RelativeLayout.LayoutParams(RelativeLayout.LayoutParams.MATCH_PARENT,  UIHelper.dpToPx(getActivity(), 50));
-                    layoutParams.addRule(RelativeLayout.ALIGN_PARENT_BOTTOM);
-                    editView.setLayoutParams(layoutParams);
-                }
-                return false;
-            }
-
-            @Override
-            public void onTouchEvent(RecyclerView rv, MotionEvent e) {
-
-
-            }
-
-            @Override
-            public void onRequestDisallowInterceptTouchEvent(boolean disallowIntercept) {
-
-            }
-        });
-
-
-        fRecyclerView.setLayoutManager(mLayoutManager);
-        fRecyclerView.setHasFixedSize(true);
         fetchFeed();
-
-        KeyboardUtil keyboardUtil = new KeyboardUtil(getActivity(), feedLl);
-        keyboardUtil.setOnSoftKeyboardListener(new KeyboardUtil.OnSoftKeyboardListener() {
-            @Override
-            public void onSizeChange(int height) {
-                resizeView(height);
-            }
-        });
-        keyboardUtil.enable();
         return view;
     }
 
-    private void test() {
-           /*
-refreshlayou = 90 dp margin bottom
-edit view height in feed 90dp
-        * */
-
-        RelativeLayout.LayoutParams l = (RelativeLayout.LayoutParams) swipyRefreshLayout.getLayoutParams();
-        l.setMargins(0, 0, 0, UIHelper.dpToPx(getContext(), 90));
-        RelativeLayout.LayoutParams layoutParams = new RelativeLayout.LayoutParams(RelativeLayout.LayoutParams.MATCH_PARENT,  UIHelper.dpToPx(getActivity(), 90));
-        layoutParams.addRule(RelativeLayout.ALIGN_PARENT_BOTTOM);
-
-        editView.setLayoutParams(layoutParams);
-
+    //Object creation
+    private KeyboardUtil getKeyboardUtil()
+    {
+        KeyboardUtil keyboardUtil = new KeyboardUtil(getActivity());
+        keyboardUtil.addCallback(this);
+        keyboardUtil.enable();
+        return keyboardUtil;
     }
 
-    private void resizeView(int height) {
-
-        if (height != 0) {
-            if (feedLl.getPaddingBottom() != height) {
-                System.out.println("HEIGHT IS " + height);
-                //set the padding of the contentView for the keyboard
-                editView.editModeStarted();
-                keyboardIsActive = true;
-                test();
-
-                feedLl.setPadding(0, 0, 0, height);
-                mLayoutManager.scrollToPositionWithOffset(0, 0);
-            }
-        } else {
-            //check if the padding is != 0 (if yes reset the padding)
-            if (feedLl.getPaddingBottom() != 0) {
-                //reset the padding of the contentView
-                feedLl.setPadding(0, 0, 0, 0);
-            }
+    private EditView getEditView() {
+        if (this.editView == null) {
+            EditView editView = (EditView) view.findViewById(R.id.editView);
+            editView.addCallback(this);
+            this.editView = editView;
         }
+        return this.editView;
     }
 
-    @Override
-    public void editViewSizeChange(int sizeChange) {
-        ViewGroup.LayoutParams lp = editView.getLayoutParams();
-        if (editViewOriginalHeight == 0) {
-            System.out.println("HAPPEND HERE!!!!!!");
-            editViewOriginalHeight = lp.height;
+    private LinearLayoutManager getmLayoutManager() {
+        if (this.mLayoutManager == null) {
+            LinearLayoutManager mLayoutManager = new LinearLayoutManager(getActivity());
+            //mLayoutManager.setStackFromEnd(true);
+            mLayoutManager.setReverseLayout(true);
+
+
+            this.mLayoutManager = mLayoutManager;
         }
-
-        int result = (sizeChange - 53);
-        if (result < 0) {
-            result = 0;
-        }
-
-        //lp.height = result + editViewOriginalHeight;
-        System.out.println("Result: " + result + " : " + sizeChange + " :::: " + lp.height);
-
-        RelativeLayout.LayoutParams layoutParams = new RelativeLayout.LayoutParams(RelativeLayout.LayoutParams.MATCH_PARENT, result + editViewOriginalHeight - UIHelper.dpToPx(getActivity(), 40));
-        layoutParams.addRule(RelativeLayout.ALIGN_PARENT_BOTTOM);
-
-        editView.setLayoutParams(layoutParams);
-        RelativeLayout.LayoutParams l = (RelativeLayout.LayoutParams) swipyRefreshLayout.getLayoutParams();
-
-        //50 default
-        int marginBottom = 50 + result;
-        System.out.println("padding " + marginBottom);
-        l.setMargins(0, 0, 0, UIHelper.dpToPx(getActivity(), 50) + result);
-        mLayoutManager.scrollToPositionWithOffset(0, 0);
-
+        return this.mLayoutManager;
     }
 
-    private void fetchFeed() {
-        if (feedModel == null) {
-            feedModel = new FeedModel();
-        }
-        feedModel.fetch(new NetworkCallback() {
-            @Override
-            public void exec(ErrorModel errorModel) {
-                // Log.v("Fetching","fetch " + arrayList);
-                fAdapter = new FeedAdapter(feedModel.getPosts());
-                fRecyclerView.setAdapter(fAdapter);
-                onItemsLoadComplete();
-                fRecyclerView.scrollToPosition(0);
+    private RecyclerView getfRecyclerView() {
+        if (this.fRecyclerView == null) {
+            RecyclerView fRecyclerView = (RecyclerView) view.findViewById(R.id.feed_recycler_view);
+            fRecyclerView.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
 
-            }
-        });
+                }
+            });
+            fRecyclerView.addOnItemTouchListener(new RecyclerView.OnItemTouchListener() {
+                @Override
+                public boolean onInterceptTouchEvent(RecyclerView rv, MotionEvent e) {
+                    if (keyboardIsActive) {
+                        hideKeyboard();
+                    }
+                    return false;
+                }
+
+                @Override
+                public void onTouchEvent(RecyclerView rv, MotionEvent e) {
+
+
+                }
+
+                @Override
+                public void onRequestDisallowInterceptTouchEvent(boolean disallowIntercept) {
+
+                }
+            });
+
+            fRecyclerView.setLayoutManager(mLayoutManager);
+            fRecyclerView.setHasFixedSize(true);
+
+            this.fRecyclerView = fRecyclerView;
+        }
+
+        return this.fRecyclerView;
     }
 
     private SwipyRefreshLayout getSwipyRefreshLayout() {
@@ -224,7 +160,92 @@ edit view height in feed 90dp
         return this.swipyRefreshLayout;
     }
 
+    //Data retrival
+    private void fetchFeed() {
+        if (feedModel == null) {
+            feedModel = new FeedModel();
+        }
+        feedModel.fetch(new NetworkCallback() {
+            @Override
+            public void exec(ErrorModel errorModel) {
+                fAdapter = new FeedAdapter(feedModel.getPosts());
+                fRecyclerView.setAdapter(fAdapter);
+                onItemsLoadComplete();
+                fRecyclerView.scrollToPosition(0);
+            }
+        });
+    }
+
     void onItemsLoadComplete() {
         swipyRefreshLayout.setRefreshing(false);
+    }
+
+    //EditView delegate methods
+    @Override
+    public void editViewSizeChange(int sizeChange) {
+        ViewGroup.LayoutParams lp = editView.getLayoutParams();
+        if (editViewOriginalHeight == 0) {
+            editViewOriginalHeight = lp.height;
+        }
+
+        int result = (sizeChange - 53);
+        if (result < 0) {
+            result = 0;
+        }
+        RelativeLayout.LayoutParams layoutParams = new RelativeLayout.LayoutParams(RelativeLayout.LayoutParams.MATCH_PARENT, result + editViewOriginalHeight - UIHelper.dpToPx(getActivity(), 40));
+        layoutParams.addRule(RelativeLayout.ALIGN_PARENT_BOTTOM);
+
+        editView.setLayoutParams(layoutParams);
+        RelativeLayout.LayoutParams l = (RelativeLayout.LayoutParams) swipyRefreshLayout.getLayoutParams();
+
+        //50 default
+        int marginBottom = 50 + result;
+        l.setMargins(0, 0, 0, UIHelper.dpToPx(getActivity(), 50) + result);
+        mLayoutManager.scrollToPositionWithOffset(0, 0);
+    }
+
+    //KeyboardUtil delegate methods
+    @Override
+    public void keyboardUtilOnSizeChange(int height) {
+        if (height != 0) {
+            if (feedLl.getPaddingBottom() != height) {
+                editView.editModeStarted();
+                keyboardIsActive = true;
+                showKeyboard();
+
+                feedLl.setPadding(0, 0, 0, height);
+                mLayoutManager.scrollToPositionWithOffset(0, 0);
+            }
+        } else {
+            if (editView.getHeight() != UIHelper.dpToPx(getActivity(), 50)) {
+                hideKeyboard();
+                editView.editModeEnded();
+            }
+            if (feedLl.getPaddingBottom() != 0) {
+                //reset the padding of the contentView
+                feedLl.setPadding(0, 0, 0, 0);
+            }
+        }
+    }
+
+    //Helper methods
+    private void showKeyboard() {
+        RelativeLayout.LayoutParams l = (RelativeLayout.LayoutParams) swipyRefreshLayout.getLayoutParams();
+        l.setMargins(0, 0, 0, UIHelper.dpToPx(getContext(), 90));
+        RelativeLayout.LayoutParams layoutParams = new RelativeLayout.LayoutParams(RelativeLayout.LayoutParams.MATCH_PARENT, UIHelper.dpToPx(getActivity(), 90));
+        layoutParams.addRule(RelativeLayout.ALIGN_PARENT_BOTTOM);
+        editView.setLayoutParams(layoutParams);
+    }
+
+    private void hideKeyboard() {
+        System.out.println("CLICKED");
+        editView.editModeEnded();
+        InputMethodManager imm = (InputMethodManager) getActivity().getSystemService(Context.INPUT_METHOD_SERVICE);
+        imm.hideSoftInputFromWindow(editView.editEt.getWindowToken(), 0);
+        RelativeLayout.LayoutParams l = (RelativeLayout.LayoutParams) swipyRefreshLayout.getLayoutParams();
+        l.setMargins(0, 0, 0, UIHelper.dpToPx(getContext(), 50));
+        RelativeLayout.LayoutParams layoutParams = new RelativeLayout.LayoutParams(RelativeLayout.LayoutParams.MATCH_PARENT, UIHelper.dpToPx(getActivity(), 50));
+        layoutParams.addRule(RelativeLayout.ALIGN_PARENT_BOTTOM);
+        editView.setLayoutParams(layoutParams);
     }
 }

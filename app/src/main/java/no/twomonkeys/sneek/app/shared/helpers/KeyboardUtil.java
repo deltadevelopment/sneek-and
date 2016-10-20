@@ -20,17 +20,15 @@ import android.view.inputmethod.InputMethodManager;
  * Created by simenlie on 19.10.2016.
  */
 public class KeyboardUtil {
-    public interface OnSoftKeyboardListener {
-        public void onSizeChange(int height);
+    public interface Callback {
+        public void keyboardUtilOnSizeChange(int height);
     }
 
     private View decorView;
-    private View contentView;
-    public OnSoftKeyboardListener onSoftKeyboardListener;
+    public Callback callback;
 
-    public KeyboardUtil(Activity act, View contentView) {
+    public KeyboardUtil(Activity act) {
         this.decorView = act.getWindow().getDecorView();
-        this.contentView = contentView;
 
         //only required on newer android versions. it was working on API level 19 (Build.VERSION_CODES.KITKAT)
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.KITKAT) {
@@ -79,7 +77,7 @@ public class KeyboardUtil {
                 }
             }
             */
-            onSoftKeyboardListener.onSizeChange(diff);
+            callback.keyboardUtilOnSizeChange(diff);
         }
     };
 
@@ -95,9 +93,7 @@ public class KeyboardUtil {
             inputMethodManager.hideSoftInputFromWindow(act.getCurrentFocus().getWindowToken(), 0);
         }
     }
-
-
-    public void setOnSoftKeyboardListener(OnSoftKeyboardListener onSoftKeyboardListener) {
-        this.onSoftKeyboardListener = onSoftKeyboardListener;
+    public void addCallback(Callback callback) {
+        this.callback = callback;
     }
 }

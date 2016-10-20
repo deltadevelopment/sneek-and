@@ -14,19 +14,38 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_margin="0dp"
-        android:padding="0dp"
-        android:background="@color/circleRed">
+        android:background="@color/circleRed"
+        android:padding="0dp">
 
-        <com.facebook.drawee.view.SimpleDraweeView
-            xmlns:fresco="http://schemas.android.com/apk/res-auto"
+        <no.twomonkeys.sneek.app.shared.views.SneekVideoView
+            android:id="@+id/postVideoView"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_centerInParent="true"
+            android:layout_centerVertical="true"
+            android:visibility="invisible"
+            android:background="@color/transparent"/>
+
+
+
+
+        <View
+            android:id="@+id/videoViewRp"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content">
+
+        </View>
+
+        <com.facebook.drawee.view.SimpleDraweeView xmlns:fresco="http://schemas.android.com/apk/res-auto"
             android:id="@+id/draweeView"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
+            android:layout_alignParentTop="true"
             android:layout_margin="0dp"
             android:background="@color/white"
             android:padding="0dp"
-            android:layout_alignParentTop="true"
             fresco:roundedCornerRadius="10dp" />
+
         <RelativeLayout
             android:id="@+id/loadingRl"
             android:layout_width="170dp"
@@ -39,6 +58,15 @@
                 android:layout_height="30dp"
                 android:layout_centerInParent="true" />
         </RelativeLayout>
+
+
+
+        <no.twomonkeys.sneek.app.shared.views.PlayLoaderView
+            android:id="@+id/playLoaderV"
+            android:layout_width="50dp"
+            android:layout_height="50dp"
+            android:layout_centerInParent="true">
+        </no.twomonkeys.sneek.app.shared.views.PlayLoaderView>
     </RelativeLayout>
 
     <LinearLayout

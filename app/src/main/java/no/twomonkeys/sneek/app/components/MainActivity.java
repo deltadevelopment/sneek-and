@@ -3,16 +3,23 @@ package no.twomonkeys.sneek.app.components;
 import android.app.Activity;
 import android.content.Context;
 import android.content.pm.ActivityInfo;
+import android.graphics.Color;
+import android.graphics.Typeface;
 import android.os.Environment;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentPagerAdapter;
+import android.support.v4.content.ContextCompat;
 import android.support.v4.view.ViewPager;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
+import android.text.Spannable;
+import android.text.SpannableString;
+import android.text.style.ForegroundColorSpan;
 import android.util.Log;
 import android.view.Window;
 import android.view.WindowManager;
+import android.widget.TextView;
 
 import com.facebook.cache.disk.DiskCacheConfig;
 import com.facebook.common.util.ByteConstants;
@@ -37,6 +44,7 @@ public class MainActivity extends AppCompatActivity {
     private CameraFragment cameraFragment;
     private CameraFragment feedFragment;
     static String TAG = "MainActivity";
+    TextView toolbarTitle;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -47,6 +55,9 @@ public class MainActivity extends AppCompatActivity {
         vpPager = (ViewPager) findViewById(R.id.vpPager);
         adapterViewPager = new MainPagerAdapter(getSupportFragmentManager());
 
+        toolbarTitle = (TextView) findViewById(R.id.toolbar_title);
+        Typeface type = Typeface.createFromAsset(getAssets(), "arial-rounded-mt-bold.ttf");
+        toolbarTitle.setTypeface(type);
 
 
         vpPager.addOnPageChangeListener(new ViewPager.OnPageChangeListener() {
@@ -58,11 +69,11 @@ public class MainActivity extends AppCompatActivity {
             public void onPageSelected(int position) {
                 switch (position) {
                     case 0:
-                        mActivity.setTitle("Friends");
+                        setActionBarTitle("Friends");
                         System.out.println("PageSelect: " + position);
                         break;
                     case 1:
-                        mActivity.setTitle("sneek");
+                        setActionBarTitle("sneek");
                         break;
                 }
             }
@@ -81,12 +92,22 @@ public class MainActivity extends AppCompatActivity {
         //cameraFragment = (CameraFragment) getFragmentManager().findFragmentById(R.id.cameraFragment);
     }
 
+    private void setActionBarTitle(String title) {
+        toolbarTitle.setText(title);
+        /*
+        mActivity.setTitle(title);
+        Spannable text = new SpannableString(title);
+        text.setSpan(new ForegroundColorSpan(ContextCompat.getColor(mActivity, R.color.themeColor)), 0, text.length(), Spannable.SPAN_INCLUSIVE_INCLUSIVE);
+        getSupportActionBar().setTitle(text);
+        */
+    }
+
     private void removeTitleBar() {
         //Remove title bar
         //this.requestWindowFeature(Window.FEATURE_NO_TITLE);
 
         //Remove notification bar
-       // this.getWindow().setFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN, WindowManager.LayoutParams.FLAG_FULLSCREEN);
+        // this.getWindow().setFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN, WindowManager.LayoutParams.FLAG_FULLSCREEN);
     }
 
     public void initConfiguration() {
@@ -115,8 +136,8 @@ public class MainActivity extends AppCompatActivity {
         setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_PORTRAIT);
 
         //Remove top bar
-       // requestWindowFeature(Window.FEATURE_NO_TITLE);
-      //  getWindow().setFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN, WindowManager.LayoutParams.FLAG_FULLSCREEN);
+        //requestWindowFeature(Window.FEATURE_NO_TITLE);
+        //  getWindow().setFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN, WindowManager.LayoutParams.FLAG_FULLSCREEN);
         //getWindow().setStatusBarColor(getResources().getColor(R.color.cyan));
         // getWindow().setFlags(WindowManager.LayoutParams.FLAG_LAYOUT_NO_LIMITS, WindowManager.LayoutParams.FLAG_LAYOUT_NO_LIMITS);
     }
