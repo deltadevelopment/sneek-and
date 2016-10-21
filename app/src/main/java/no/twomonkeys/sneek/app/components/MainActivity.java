@@ -3,22 +3,17 @@ package no.twomonkeys.sneek.app.components;
 import android.app.Activity;
 import android.content.Context;
 import android.content.pm.ActivityInfo;
-import android.graphics.Color;
 import android.graphics.Typeface;
 import android.os.Environment;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentPagerAdapter;
-import android.support.v4.content.ContextCompat;
-import android.support.v4.view.ViewPager;
+
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
-import android.text.Spannable;
-import android.text.SpannableString;
-import android.text.style.ForegroundColorSpan;
-import android.util.Log;
-import android.view.Window;
-import android.view.WindowManager;
+import android.support.v7.widget.Toolbar;
+import android.view.View;
+import android.view.animation.AccelerateInterpolator;
 import android.widget.TextView;
 
 import com.facebook.cache.disk.DiskCacheConfig;
@@ -33,9 +28,8 @@ import no.twomonkeys.sneek.app.components.camera.CameraFragment;
 import no.twomonkeys.sneek.app.components.feed.FeedFragment;
 import no.twomonkeys.sneek.app.components.friends.FriendsFragment;
 import no.twomonkeys.sneek.app.shared.helpers.CacheKeyFactory;
-import no.twomonkeys.sneek.app.shared.helpers.DataHelper;
 
-public class MainActivity extends AppCompatActivity {
+public class MainActivity extends AppCompatActivity implements FeedFragment.Callback {
     FragmentPagerAdapter adapterViewPager;
 
     public static Activity mActivity;
@@ -44,22 +38,24 @@ public class MainActivity extends AppCompatActivity {
     private CameraFragment cameraFragment;
     private CameraFragment feedFragment;
     static String TAG = "MainActivity";
-    TextView toolbarTitle;
+    //TextView toolbarTitle;
+    //Toolbar toolbar;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         initConfiguration();
         removeTitleBar();
-        setContentView(R.layout.view_pager);
+        setContentView(R.layout.activity_main);
         vpPager = (ViewPager) findViewById(R.id.vpPager);
-        adapterViewPager = new MainPagerAdapter(getSupportFragmentManager());
-
+        vpPager.setSwipeable(true);
+        adapterViewPager = new MainPagerAdapter(getSupportFragmentManager(), this);
+/*
         toolbarTitle = (TextView) findViewById(R.id.toolbar_title);
         Typeface type = Typeface.createFromAsset(getAssets(), "arial-rounded-mt-bold.ttf");
         toolbarTitle.setTypeface(type);
-
-
+        toolbar = (Toolbar) findViewById(R.id.toolbar_top);
+*/
         vpPager.addOnPageChangeListener(new ViewPager.OnPageChangeListener() {
             @Override
             public void onPageScrolled(int position, float positionOffset, int positionOffsetPixels) {
@@ -92,14 +88,12 @@ public class MainActivity extends AppCompatActivity {
         //cameraFragment = (CameraFragment) getFragmentManager().findFragmentById(R.id.cameraFragment);
     }
 
+    public void setSwipeable(boolean swipeable) {
+        vpPager.setSwipeable(swipeable);
+    }
+
     private void setActionBarTitle(String title) {
-        toolbarTitle.setText(title);
-        /*
-        mActivity.setTitle(title);
-        Spannable text = new SpannableString(title);
-        text.setSpan(new ForegroundColorSpan(ContextCompat.getColor(mActivity, R.color.themeColor)), 0, text.length(), Spannable.SPAN_INCLUSIVE_INCLUSIVE);
-        getSupportActionBar().setTitle(text);
-        */
+        // toolbarTitle.setText(title);
     }
 
     private void removeTitleBar() {
@@ -142,6 +136,9 @@ public class MainActivity extends AppCompatActivity {
         // getWindow().setFlags(WindowManager.LayoutParams.FLAG_LAYOUT_NO_LIMITS, WindowManager.LayoutParams.FLAG_LAYOUT_NO_LIMITS);
     }
 
+    public ViewPager getVpPager() {
+        return vpPager;
+    }
 
     @Override
     protected void onStart() {
@@ -150,11 +147,24 @@ public class MainActivity extends AppCompatActivity {
         vpPager.setCurrentItem(1);
     }
 
+    //Feed fragment delegates
+    @Override
+    public void feedFragmentOnFullScreenStart() {
+        //toolbar.setVisibility(View.GONE);
+    }
+
+    @Override
+    public void feedFragmentOnFullScreenEnd() {
+        //toolbar.setVisibility(View.VISIBLE);
+    }
+
     public static class MainPagerAdapter extends FragmentPagerAdapter {
         private static int NUM_ITEMS = 2;
+        private Activity activity;
 
-        public MainPagerAdapter(FragmentManager fragmentManager) {
+        public MainPagerAdapter(FragmentManager fragmentManager, Activity activity) {
             super(fragmentManager);
+            this.activity = activity;
         }
 
         @Override
@@ -168,7 +178,9 @@ public class MainActivity extends AppCompatActivity {
                 case 0:
                     return FriendsFragment.newInstance();
                 case 1:
-                    return FeedFragment.newInstance();
+                    FeedFragment ff = FeedFragment.newInstance();
+                    ff.addCallback((FeedFragment.Callback) activity);
+                    return ff;
                 default:
                     return null;
             }
@@ -176,5 +188,11 @@ public class MainActivity extends AppCompatActivity {
 
     }
 
+
+/*
+    public Toolbar getToolbar() {
+        return toolbar;
+    }
+*/
 }
 

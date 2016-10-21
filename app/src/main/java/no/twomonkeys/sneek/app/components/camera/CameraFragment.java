@@ -2,12 +2,8 @@ package no.twomonkeys.sneek.app.components.camera;
 
 import android.app.Fragment;
 import android.app.FragmentTransaction;
-import android.graphics.Bitmap;
-import android.graphics.BitmapFactory;
 import android.graphics.Rect;
-import android.graphics.RectF;
 import android.hardware.Camera;
-import android.media.Image;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.v4.content.ContextCompat;
@@ -20,10 +16,7 @@ import android.view.ViewGroup;
 import android.widget.FrameLayout;
 import android.widget.ImageButton;
 import android.widget.LinearLayout;
-import android.widget.RelativeLayout;
-import android.widget.TextView;
 
-import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -57,7 +50,7 @@ public class CameraFragment extends Fragment implements CameraEditFragment.Callb
     @Nullable
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
-        view = inflater.inflate(R.layout.camera, container, false);
+        view = inflater.inflate(R.layout.fragment_camera, container, false);
 
         view.setOnTouchListener(new View.OnTouchListener() {
             private GestureDetector gestureDetector = new GestureDetector(getActivity(), new GestureDetector.SimpleOnGestureListener() {
@@ -176,7 +169,7 @@ public class CameraFragment extends Fragment implements CameraEditFragment.Callb
         }
     }
 
-    //Opens the camera safely
+    //Opens the fragment_camera safely
     private boolean safeCameraOpen(int id) {
         boolean qOpened = false;
 
@@ -192,7 +185,7 @@ public class CameraFragment extends Fragment implements CameraEditFragment.Callb
         return qOpened;
     }
 
-    //Releases the camera
+    //Releases the fragment_camera
     private void releaseCameraAndPreview() {
         //mPreview.setCamera(null);
         if (mCamera != null) {
@@ -359,7 +352,7 @@ public class CameraFragment extends Fragment implements CameraEditFragment.Callb
     }
 
 
-    //Camera edit fragment callback
+    //Camera layout_edit fragment callback
     @Override
     public void cameraEditOnClose() {
         Log.v("CLOSED", "CLOSED EDIT");

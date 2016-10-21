@@ -1,21 +1,14 @@
 package no.twomonkeys.sneek.app.components.friends;
 
 import android.content.Context;
-import android.graphics.Color;
-import android.graphics.drawable.ColorDrawable;
-import android.graphics.drawable.Drawable;
 import android.graphics.drawable.GradientDrawable;
-import android.graphics.drawable.ShapeDrawable;
 import android.support.v4.content.ContextCompat;
 import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageView;
-import android.widget.RelativeLayout;
 import android.widget.TextView;
-
-import org.w3c.dom.Text;
 
 import java.util.ArrayList;
 import java.util.Random;
@@ -58,7 +51,7 @@ class FriendsAdapter extends RecyclerView.Adapter<FriendsAdapter.ViewHolder> {
 
         this.mContext = parent.getContext();
 
-        View view = LayoutInflater.from(mContext).inflate(R.layout.row_item, parent, false);
+        View view = LayoutInflater.from(mContext).inflate(R.layout.row_item_friends, parent, false);
 
 
         return new ViewHolder(view);

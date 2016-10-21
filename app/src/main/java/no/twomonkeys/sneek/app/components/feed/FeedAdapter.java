@@ -5,30 +5,31 @@ import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.LinearLayout;
-import android.widget.RelativeLayout;
 
 import java.util.ArrayList;
 
 import no.twomonkeys.sneek.R;
-import no.twomonkeys.sneek.app.shared.SimpleCallback2;
-import no.twomonkeys.sneek.app.shared.helpers.Size;
-import no.twomonkeys.sneek.app.shared.helpers.UIHelper;
-import no.twomonkeys.sneek.app.shared.models.FollowingModel;
 import no.twomonkeys.sneek.app.shared.models.PostModel;
 
 /**
  * Created by simenlie on 13.10.2016.
  */
 
-public class FeedAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
+public class FeedAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> implements ImageViewHolder.Callback {
     private ArrayList<PostModel> posts;
 
     private Context mContext;
+    private ImageViewHolder lastImageViewHolder;
 
     FeedAdapter(ArrayList<PostModel> posts) {
         this.posts = posts;
     }
+
+    public interface Callback {
+        public void feedAdapterTap(PostModel postModel);
+    }
+
+    Callback callback;
 
     @Override
     public int getItemViewType(int position) {
@@ -48,11 +49,13 @@ public class FeedAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
 
         this.mContext = parent.getContext();
         if (viewType == 0) {
-            View view = LayoutInflater.from(mContext).inflate(R.layout.message_row_item, parent, false);
+            View view = LayoutInflater.from(mContext).inflate(R.layout.row_item_message, parent, false);
             return new MessageViewHolder(view);
         } else {
-            View view = LayoutInflater.from(mContext).inflate(R.layout.image_row_item, parent, false);
-            return new ImageViewHolder(view);
+            View view = LayoutInflater.from(mContext).inflate(R.layout.row_item_image, parent, false);
+            ImageViewHolder ivh = new ImageViewHolder(view);
+            ivh.addCallback(this);
+            return ivh;
         }
     }
 
@@ -72,15 +75,21 @@ public class FeedAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
     public int getItemCount() {
         return posts.size();
     }
-/*
-    private void setRandomColor(RecyclerView.ViewHolder holder) {
-        int[] colors = { R.color.circleBlue, R.color.circleGreen, R.color.circleGrey, R.color.circleRed };
 
-        GradientDrawable background = (GradientDrawable) holder.imageCircleIv.getBackground();
-        Random r = new Random();
-        background.setColor(ContextCompat.getColor(mContext, colors[r.nextInt(4)]));
+    @Override
+    public void imageViewHolderVideoStarted(ImageViewHolder imageViewHolder) {
+        if (lastImageViewHolder != null) {
+            lastImageViewHolder.stopVideo();
+        }
+        lastImageViewHolder = imageViewHolder;
     }
-*/
 
+    @Override
+    public void imageViewHolderTap(PostModel postModel) {
+        callback.feedAdapterTap(postModel);
+    }
 
+    public void addCallback(Callback callback) {
+        this.callback = callback;
+    }
 }

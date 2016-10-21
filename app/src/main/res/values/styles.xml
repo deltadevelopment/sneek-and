@@ -7,6 +7,6 @@
         <item name="colorAccent">@color/colorAccent</item>
         <item name="android:textColorPrimary">@color/colorPrimaryDark</item>
         <item name="android:textColor">@color/themeColor</item>
-
+        <item name="android:windowContentOverlay">@null</item>
     </style>
 </resources>

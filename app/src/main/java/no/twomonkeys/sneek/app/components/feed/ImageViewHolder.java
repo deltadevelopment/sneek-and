@@ -17,6 +17,7 @@ import android.media.MediaPlayer;
 import android.net.Uri;
 import android.support.v4.content.ContextCompat;
 import android.support.v7.widget.RecyclerView;
+import android.telecom.Call;
 import android.util.Log;
 import android.view.MotionEvent;
 import android.view.View;
@@ -64,12 +65,21 @@ public class ImageViewHolder extends RecyclerView.ViewHolder {
     private MediaPlayer mediaPlayer;
     Context context;
     boolean isVisible = true;
+    boolean longPressing;
+
+    public interface Callback {
+        public void imageViewHolderVideoStarted(ImageViewHolder imageViewHolder);
+
+        public void imageViewHolderTap(PostModel postModel);
+    }
+
+    Callback callback;
 
     ImageViewHolder(View view) {
         super(view);
         loadingRl = (RelativeLayout) view.findViewById(R.id.loadingRl);
         imageRowLl = (LinearLayout) view.findViewById(R.id.imageRowLl);
-        draweeView = (SimpleDraweeView) itemView.findViewById(R.id.draweeView);
+        draweeView = getDraweeView();
         usernameTv = (TextView) itemView.findViewById(R.id.usernameTv);
         createdAtTv = (TextView) itemView.findViewById(R.id.createdAtTv);
         progressBar = (ProgressBar) itemView.findViewById(R.id.progressBar);
@@ -77,6 +87,33 @@ public class ImageViewHolder extends RecyclerView.ViewHolder {
         playLoaderV = getPlayLoaderV();
         postVideoView = getPostVideoView();
         videoViewRp = (View) itemView.findViewById(R.id.videoViewRp);
+    }
+
+    private SimpleDraweeView getDraweeView() {
+        if (this.draweeView == null) {
+            SimpleDraweeView draweeView = (SimpleDraweeView) itemView.findViewById(R.id.draweeView);
+            draweeView.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    if (longPressing) {
+                        longPressing = false;
+                    } else {
+                        System.out.println("SINGLE TAP IMAGE");
+                        callback.imageViewHolderTap(postModel);
+                    }
+                }
+            });
+            draweeView.setOnLongClickListener(new View.OnLongClickListener() {
+                @Override
+                public boolean onLongClick(View v) {
+                    longPressing = true;
+                    System.out.println("LONG PRESSING");
+                    return false;
+                }
+            });
+            this.draweeView = draweeView;
+        }
+        return this.draweeView;
     }
 
     private SneekVideoView getPostVideoView() {
@@ -106,16 +143,24 @@ public class ImageViewHolder extends RecyclerView.ViewHolder {
     }
 
     private void loadVideo() {
+        callback.imageViewHolderVideoStarted(this);
         this.playLoaderV.startAnimating();
         System.out.println("FETCHING MOVIEW");
         final ImageViewHolder self = this;
-        postModel.fetchVideo((Activity) context,new PostModel.AsyncCallback() {
+        postModel.fetchVideo((Activity) context, new PostModel.AsyncCallback() {
             @Override
             public void fileRetrieved(File file) {
                 System.out.println("FILE retrieved");
                 self.loadVideo2(file);
             }
         });
+    }
+
+    public void stopVideo() {
+        postVideoView.stopPlayback();
+        postVideoView.setVisibility(View.INVISIBLE);
+        draweeView.setVisibility(View.VISIBLE);
+        playLoaderV.show();
     }
 
     public void loadVideo2(File file) {
@@ -285,8 +330,7 @@ public class ImageViewHolder extends RecyclerView.ViewHolder {
     public boolean isRounded(float value) {
         if (value == 26) {
             return true;
-        }
-        else{
+        } else {
             return false;
         }
     }
@@ -341,6 +385,10 @@ public class ImageViewHolder extends RecyclerView.ViewHolder {
         path.close();//Given close, last lineto can be removed.
 
         return path;
+    }
+
+    public void addCallback(Callback callback) {
+        this.callback = callback;
     }
 
 }

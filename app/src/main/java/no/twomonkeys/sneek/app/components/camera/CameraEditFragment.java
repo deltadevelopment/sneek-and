@@ -79,7 +79,7 @@ public class CameraEditFragment extends Fragment {
     @Nullable
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
-        view = inflater.inflate(R.layout.camera_edit, container, false);
+        view = inflater.inflate(R.layout.fragment_camera_edit, container, false);
 
 
         view.setOnTouchListener(new RepeatListener(100, 0, new RepeatListener.Listener() {
@@ -316,7 +316,7 @@ public class CameraEditFragment extends Fragment {
     }
 
     public void captionClick() {
-        //animate in edit view here
+        //animate in layout_edit view here
         animateCaptionIn();
     }
 

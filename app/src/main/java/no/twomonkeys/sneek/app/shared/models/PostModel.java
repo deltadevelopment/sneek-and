@@ -1,7 +1,10 @@
 package no.twomonkeys.sneek.app.shared.models;
 
 import android.app.Activity;
+import android.graphics.Bitmap;
 import android.graphics.drawable.Animatable;
+import android.graphics.drawable.BitmapDrawable;
+import android.graphics.drawable.Drawable;
 import android.net.Uri;
 import android.os.Environment;
 import android.support.annotation.Nullable;
@@ -78,7 +81,7 @@ public class PostModel extends CRUDModel {
     }
 
 
-    public void loadPhoto(SimpleDraweeView sdv, final SimpleCallback2 scb) {
+    public void loadPhoto(final SimpleDraweeView sdv, final SimpleCallback2 scb) {
         Uri uri;
         if (media_type == 0) {
             DataHelper.addCacheHelp(media_key, media_url);
@@ -183,8 +186,6 @@ public class PostModel extends CRUDModel {
 
                 }
             });
-
-
         }
     }
 
@@ -262,6 +263,7 @@ public class PostModel extends CRUDModel {
     public PostArtifacts getPostArtifacts() {
         return postArtifacts;
     }
+
 }
 
 

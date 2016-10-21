@@ -30,7 +30,7 @@ public class FeedModel extends CRUDModel {
     void build(Map map) {
         ArrayList<Map> postsRaw = (ArrayList) map.get("posts");
 
-            posts = new ArrayList<>();
+        posts = new ArrayList<>();
 
         for (Map postRaw : postsRaw) {
             PostModel postModel = new PostModel(postRaw);
@@ -110,7 +110,7 @@ public class FeedModel extends CRUDModel {
             boolean isInTimeRange = DateHelper.isSameTimeWithDates(DateHelper.dateForString(postModel.getCreated_at()), DateHelper.dateForString(createdAt));
             postArtifacts.sameUserNext = userId == postModel.getUserModel().getId() && isInTimeRange;
 
-            Log.v("TIME RANGE","is " + postArtifacts.sameUserNext + " : " + userId + " : " + postModel.getUserModel().getId() + " : " + isInTimeRange + " : " + createdAt + " : " + postModel.getCreated_at());
+            Log.v("TIME RANGE", "is " + postArtifacts.sameUserNext + " : " + userId + " : " + postModel.getUserModel().getId() + " : " + isInTimeRange + " : " + createdAt + " : " + postModel.getCreated_at());
 
             postArtifacts.nextIsMessage = true; //Was not here on moment in iOS version
             postArtifacts.isLastInDay = !DateHelper.isSameDayWithDates(DateHelper.dateForString(postModel.getCreated_at()), DateHelper.dateForString(createdAt));
@@ -123,7 +123,7 @@ public class FeedModel extends CRUDModel {
             postArtifacts.isSameDay = DateHelper.isSameDayWithDates(DateHelper.dateForString(postModel.getCreated_at()), DateHelper.dateForString(createdAt));
         }
 
-     //   Log.v("TIME RANGE","is " + postArtifacts.sameUserNext);
+        //   Log.v("TIME RANGE","is " + postArtifacts.sameUserNext);
 
 
         return postArtifacts;

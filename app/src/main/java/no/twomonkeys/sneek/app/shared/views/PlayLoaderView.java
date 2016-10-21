@@ -4,9 +4,7 @@ import android.animation.Animator;
 import android.content.Context;
 import android.util.AttributeSet;
 import android.view.LayoutInflater;
-import android.widget.ImageButton;
 import android.widget.ImageView;
-import android.widget.LinearLayout;
 import android.widget.RelativeLayout;
 
 import no.twomonkeys.sneek.R;
@@ -40,7 +38,7 @@ public class PlayLoaderView extends RelativeLayout {
         this.context = context;
         LayoutInflater inflater = (LayoutInflater) context
                 .getSystemService(Context.LAYOUT_INFLATER_SERVICE);
-        inflater.inflate(R.layout.play_loader, this);
+        inflater.inflate(R.layout.layout_play_loader, this);
     }
 
     @Override
@@ -51,10 +49,12 @@ public class PlayLoaderView extends RelativeLayout {
 
     }
 
-    public void show()
-    {
+    public void show() {
         setVisibility(VISIBLE);
+        circleIb.invalidate();
+        circleIb.clearAnimation();
         circleIb.setAlpha(1f);
+        circleIb.animate().alpha(1f).setDuration(1);
     }
 
     public void startAnimating() {

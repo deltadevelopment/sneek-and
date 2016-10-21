@@ -1,46 +1,44 @@
 package no.twomonkeys.sneek.app.components.feed;
 
 import android.content.Context;
-import android.content.res.Configuration;
-import android.graphics.Rect;
 import android.graphics.Typeface;
-import android.os.Handler;
 import android.support.v4.app.Fragment;
 import android.os.Bundle;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewGroup;
-import android.view.ViewTreeObserver;
 import android.view.Window;
 import android.view.WindowManager;
 import android.view.inputmethod.InputMethodManager;
-import android.widget.EditText;
-import android.widget.LinearLayout;
 import android.widget.RelativeLayout;
+import android.widget.TextView;
 
 import com.orangegangsters.github.swipyrefreshlayout.library.SwipyRefreshLayout;
 import com.orangegangsters.github.swipyrefreshlayout.library.SwipyRefreshLayoutDirection;
 
 import no.twomonkeys.sneek.R;
 
+import no.twomonkeys.sneek.app.components.MainActivity;
+import no.twomonkeys.sneek.app.components.feed.views.EditView;
+import no.twomonkeys.sneek.app.components.feed.views.SimpleImageViewer;
 import no.twomonkeys.sneek.app.shared.NetworkCallback;
 import no.twomonkeys.sneek.app.shared.helpers.KeyboardUtil;
 import no.twomonkeys.sneek.app.shared.helpers.UIHelper;
 import no.twomonkeys.sneek.app.shared.models.ErrorModel;
 import no.twomonkeys.sneek.app.shared.models.FeedModel;
+import no.twomonkeys.sneek.app.shared.models.PostModel;
 
 /**
  * Created by simenlie on 13.10.2016.
  */
 
-public class FeedFragment extends Fragment implements EditView.Callback, KeyboardUtil.Callback {
+public class FeedFragment extends Fragment implements EditView.Callback, KeyboardUtil.Callback, FeedAdapter.Callback, SimpleImageViewer.Callback {
 
     private RecyclerView fRecyclerView;
-    private RecyclerView.Adapter fAdapter;
+    private FeedAdapter fAdapter;
     private FeedModel feedModel;
     private SwipyRefreshLayout swipyRefreshLayout;
     private View view;
@@ -49,6 +47,17 @@ public class FeedFragment extends Fragment implements EditView.Callback, Keyboar
     EditView editView;
     int editViewOriginalHeight;
     boolean keyboardIsActive;
+    SimpleImageViewer postSiv;
+    TextView toolbarTitle;
+
+
+    public interface Callback {
+        public void feedFragmentOnFullScreenStart();
+
+        public void feedFragmentOnFullScreenEnd();
+    }
+
+    Callback callback;
 
 
     public static FeedFragment newInstance() {
@@ -64,7 +73,7 @@ public class FeedFragment extends Fragment implements EditView.Callback, Keyboar
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
-        view = inflater.inflate(R.layout.feed, container, false);
+        view = inflater.inflate(R.layout.fragment_feed, container, false);
         feedLl = (RelativeLayout) view.findViewById(R.id.feed);
 
         mLayoutManager = getmLayoutManager();
@@ -72,14 +81,22 @@ public class FeedFragment extends Fragment implements EditView.Callback, Keyboar
         swipyRefreshLayout = getSwipyRefreshLayout();
         editView = getEditView();
         KeyboardUtil keyboardUtil = getKeyboardUtil();
+        postSiv = (SimpleImageViewer) view.findViewById(R.id.postSiv);
+        postSiv.addCallback(this);
+
+
+        toolbarTitle = (TextView) view.findViewById(R.id.toolbar_title);
+        Typeface type = Typeface.createFromAsset(getActivity().getAssets(), "arial-rounded-mt-bold.ttf");
+        toolbarTitle.setTypeface(type);
+
+
 
         fetchFeed();
         return view;
     }
 
     //Object creation
-    private KeyboardUtil getKeyboardUtil()
-    {
+    private KeyboardUtil getKeyboardUtil() {
         KeyboardUtil keyboardUtil = new KeyboardUtil(getActivity());
         keyboardUtil.addCallback(this);
         keyboardUtil.enable();
@@ -121,6 +138,8 @@ public class FeedFragment extends Fragment implements EditView.Callback, Keyboar
                 public boolean onInterceptTouchEvent(RecyclerView rv, MotionEvent e) {
                     if (keyboardIsActive) {
                         hideKeyboard();
+                    } else {
+
                     }
                     return false;
                 }
@@ -162,6 +181,7 @@ public class FeedFragment extends Fragment implements EditView.Callback, Keyboar
 
     //Data retrival
     private void fetchFeed() {
+        final FeedFragment mFeedFragment = this;
         if (feedModel == null) {
             feedModel = new FeedModel();
         }
@@ -169,6 +189,7 @@ public class FeedFragment extends Fragment implements EditView.Callback, Keyboar
             @Override
             public void exec(ErrorModel errorModel) {
                 fAdapter = new FeedAdapter(feedModel.getPosts());
+                fAdapter.addCallback(mFeedFragment);
                 fRecyclerView.setAdapter(fAdapter);
                 onItemsLoadComplete();
                 fRecyclerView.scrollToPosition(0);
@@ -241,11 +262,43 @@ public class FeedFragment extends Fragment implements EditView.Callback, Keyboar
         System.out.println("CLICKED");
         editView.editModeEnded();
         InputMethodManager imm = (InputMethodManager) getActivity().getSystemService(Context.INPUT_METHOD_SERVICE);
-        imm.hideSoftInputFromWindow(editView.editEt.getWindowToken(), 0);
+        imm.hideSoftInputFromWindow(editView.getEditEt().getWindowToken(), 0);
         RelativeLayout.LayoutParams l = (RelativeLayout.LayoutParams) swipyRefreshLayout.getLayoutParams();
         l.setMargins(0, 0, 0, UIHelper.dpToPx(getContext(), 50));
         RelativeLayout.LayoutParams layoutParams = new RelativeLayout.LayoutParams(RelativeLayout.LayoutParams.MATCH_PARENT, UIHelper.dpToPx(getActivity(), 50));
         layoutParams.addRule(RelativeLayout.ALIGN_PARENT_BOTTOM);
         editView.setLayoutParams(layoutParams);
+    }
+
+    @Override
+    public void feedAdapterTap(PostModel postModel) {
+        getActivity().getWindow().setFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN, WindowManager.LayoutParams.FLAG_FULLSCREEN);
+
+        MainActivity mact = (MainActivity) getActivity();
+        mact.setSwipeable(false);
+       // mact.getToolbar().setVisibility(View.GONE);
+
+        postSiv.setVisibility(View.VISIBLE);
+        postSiv.updatePost(postModel);
+        postSiv.setVisibility(View.VISIBLE);
+
+    }
+
+    public void addCallback(Callback callback) {
+        this.callback = callback;
+    }
+
+    //simple image viewer delegate
+    @Override
+    public void simpleImageViewerClose() {
+        MainActivity mact = (MainActivity) getActivity();
+        mact.setSwipeable(true);
+      //  mact.getToolbar().setVisibility(View.VISIBLE);
+        getActivity().getWindow().clearFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN);
+    }
+
+    @Override
+    public void simpleImageViewerAnimatedIn() {
+
     }
 }

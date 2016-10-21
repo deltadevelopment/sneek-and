@@ -1,32 +1,18 @@
-package no.twomonkeys.sneek.app.components.feed;
+package no.twomonkeys.sneek.app.components.feed.views;
 
-import android.app.Fragment;
 import android.content.Context;
 import android.graphics.Typeface;
-import android.media.Image;
-import android.os.Bundle;
 import android.os.Handler;
-import android.support.v7.widget.LinearLayoutManager;
-import android.support.v7.widget.RecyclerView;
 import android.text.Editable;
 import android.text.TextWatcher;
 import android.util.AttributeSet;
-import android.util.Log;
 import android.view.LayoutInflater;
-import android.view.View;
-import android.view.ViewGroup;
-import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ImageButton;
-import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.RelativeLayout;
 
 import no.twomonkeys.sneek.R;
-import no.twomonkeys.sneek.app.components.camera.CameraEditFragment;
-import no.twomonkeys.sneek.app.shared.SimpleCallback2;
-import no.twomonkeys.sneek.app.shared.helpers.DataHelper;
-import no.twomonkeys.sneek.app.shared.helpers.KeyboardUtil;
 import no.twomonkeys.sneek.app.shared.helpers.UIHelper;
 
 /**
@@ -72,7 +58,7 @@ public class EditView extends RelativeLayout {
         this.context = context;
         LayoutInflater inflater = (LayoutInflater) context
                 .getSystemService(Context.LAYOUT_INFLATER_SERVICE);
-        inflater.inflate(R.layout.edit, this);
+        inflater.inflate(R.layout.layout_edit, this);
     }
 
     @Override
@@ -93,7 +79,7 @@ public class EditView extends RelativeLayout {
         return cameraBtn;
     }
 
-    private EditText getEditEt() {
+    public EditText getEditEt() {
         if (this.editEt == null) {
             final EditText editEt = (EditText) findViewById(R.id.editEt);
             Typeface type = Typeface.createFromAsset(context.getAssets(), "arial-rounded-mt-bold.ttf");
@@ -158,4 +144,7 @@ public class EditView extends RelativeLayout {
         editEt.setPadding(0,0,0,UIHelper.dpToPx(getContext(), 0));
         editEt.setCursorVisible(false);
     }
+
+
+
 }

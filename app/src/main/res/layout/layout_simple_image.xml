@@ -1,0 +1,35 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:id="@+id/sRootRl"
+    android:background="@color/whiteTrsp"
+    tools:context="no.twomonkeys.sneek.app.components.MainActivity">
+
+    <RelativeLayout
+        android:id="@+id/sWrapperRl"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent">
+        <com.facebook.drawee.view.SimpleDraweeView xmlns:fresco="http://schemas.android.com/apk/res-auto"
+            android:id="@+id/sPostSdv"
+            android:layout_width="fill_parent"
+            android:layout_height="wrap_content"
+            android:layout_centerInParent="true"
+            android:adjustViewBounds="true"
+            android:background="@color/blackColor"
+            android:scaleType="fitCenter" />
+        <!--The y translation of this textview is set manually in code-->
+        <TextView
+            android:id="@+id/sCaptionTxt"
+            android:layout_width="wrap_content"
+            android:padding="10dp"
+            android:textSize="18sp"
+            android:textColor="@color/captionGrey"
+            android:layout_height="wrap_content"
+            android:text="caption goes here..."/>
+    </RelativeLayout>
+
+
+</RelativeLayout>

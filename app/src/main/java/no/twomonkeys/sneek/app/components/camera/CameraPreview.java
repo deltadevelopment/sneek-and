@@ -24,7 +24,7 @@ import java.util.List;
  */
 
 /**
- * Surface on which the camera projects it's capture results.
+ * Surface on which the fragment_camera projects it's capture results.
  */
 
 class CameraPreview extends ViewGroup implements SurfaceHolder.Callback {
@@ -83,7 +83,7 @@ class CameraPreview extends ViewGroup implements SurfaceHolder.Callback {
     }
 
     public void surfaceChanged(SurfaceHolder holder, int format, int w, int h) {
-        // Now that the size is known, set up the camera parameters and begin
+        // Now that the size is known, set up the fragment_camera parameters and begin
         // the preview.
         mCamera.setDisplayOrientation(90);
         Camera.Parameters parameters = mCamera.getParameters();
@@ -170,8 +170,8 @@ class CameraPreview extends ViewGroup implements SurfaceHolder.Callback {
             // Call stopPreview() to stop updating the preview surface.
             mCamera.stopPreview();
 
-            // Important: Call release() to release the camera for use by other
-            // applications. Applications should release the camera immediately
+            // Important: Call release() to release the fragment_camera for use by other
+            // applications. Applications should release the fragment_camera immediately
             // during onPause() and re-open() it during onResume()).
             mCamera.release();
 

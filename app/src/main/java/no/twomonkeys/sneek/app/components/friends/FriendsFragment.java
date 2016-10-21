@@ -2,7 +2,6 @@ package no.twomonkeys.sneek.app.components.friends;
 
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
-import android.support.v4.content.ContextCompat;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.util.Log;
@@ -41,7 +40,7 @@ public class FriendsFragment extends Fragment {
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
-        View view = inflater.inflate(R.layout.friends, container, false);
+        View view = inflater.inflate(R.layout.fragment_friends, container, false);
 
         fRecyclerView = (RecyclerView) view.findViewById(R.id.following_recycler_view);
 

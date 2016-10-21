@@ -31,6 +31,7 @@ public class NetworkHelper {
             public void onResponse(Call<ResponseModel> call, Response<ResponseModel> response) {
                 ResponseModel responseModel = response.body();
                 if (responseModel != null){
+                    System.out.println("DATA: " + responseModel.data);
                     mcb.callbackCall(contract.generic_contract(responseModel.data));
                 }
                 handleError(response, scb);
