@@ -37,8 +37,11 @@ public interface SneekApi {
     @GET("v1/following")
     Call<ResponseModel> getFollowing();
 
-    // Upload
+    //Suggestion
+    @GET("v1/feed/suggestions")
+    Call<ResponseModel> getSuggestion();
 
+    // Upload
     @PUT
     @Headers("Content-Type: multipart/form-data;boundary=95416089-b2fd-4eab-9a14-166bb9c5788b")
     Call<ResponseBody> upload(@Url String url,
