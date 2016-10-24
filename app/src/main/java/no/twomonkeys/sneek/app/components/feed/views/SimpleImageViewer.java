@@ -3,24 +3,32 @@ package no.twomonkeys.sneek.app.components.feed.views;
 import android.animation.ArgbEvaluator;
 import android.animation.ObjectAnimator;
 import android.animation.PropertyValuesHolder;
+import android.app.Activity;
 import android.content.Context;
 import android.graphics.drawable.ColorDrawable;
+import android.media.MediaPlayer;
 import android.util.AttributeSet;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.MotionEvent;
 import android.view.View;
 import android.widget.ImageView;
+import android.widget.MediaController;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
 
 import com.facebook.drawee.view.SimpleDraweeView;
 
+import java.io.File;
+
 import no.twomonkeys.sneek.R;
+import no.twomonkeys.sneek.app.components.feed.ImageViewHolder;
 import no.twomonkeys.sneek.app.shared.SimpleCallback2;
 import no.twomonkeys.sneek.app.shared.helpers.Size;
 import no.twomonkeys.sneek.app.shared.helpers.UIHelper;
 import no.twomonkeys.sneek.app.shared.models.PostModel;
+import no.twomonkeys.sneek.app.shared.views.PlayLoaderView;
+import no.twomonkeys.sneek.app.shared.views.SneekVideoView;
 
 /**
  * Created by simenlie on 21.10.2016.
@@ -38,6 +46,11 @@ public class SimpleImageViewer extends RelativeLayout {
     TextView sCaptionTxt;
     int lastBgAlpha;
     boolean movingUp;
+    SneekVideoView sVideoView;
+    private MediaController mediaControls;
+    private int mPlayerPosition;
+    private MediaPlayer mediaPlayer;
+    PlayLoaderView sPlayLoaderV;
 
     public interface Callback {
         public void simpleImageViewerClose();
@@ -80,7 +93,9 @@ public class SimpleImageViewer extends RelativeLayout {
         sWrapperRl = (RelativeLayout) findViewById(R.id.sWrapperRl);
         sRootRl = (RelativeLayout) findViewById(R.id.sRootRl);
         sCaptionTxt = (TextView) findViewById(R.id.sCaptionTxt);
-
+        sVideoView = (SneekVideoView) findViewById(R.id.sVideoView);
+        sPlayLoaderV = (PlayLoaderView) findViewById(R.id.sPlayLoaderV);
+        sPlayLoaderV.setVisibility(INVISIBLE);
         setOnTouchListener(new View.OnTouchListener() {
             @Override
             public boolean onTouch(View v, MotionEvent event) {
@@ -108,6 +123,9 @@ public class SimpleImageViewer extends RelativeLayout {
     }
 
     public void updatePost(PostModel postModel) {
+        stopVideo();
+        sVideoView.setVisibility(INVISIBLE);
+        sPlayLoaderV.setVisibility(INVISIBLE);
         RelativeLayout.LayoutParams params = new RelativeLayout.LayoutParams(200, RelativeLayout.LayoutParams.WRAP_CONTENT);
         Size size = getFullScreenSize(postModel.getImage_width(), postModel.getImage_height());
         params.width = (int) size.width;
@@ -115,6 +133,7 @@ public class SimpleImageViewer extends RelativeLayout {
         params.setMargins(0, 0, 0, 0);
         params.addRule(CENTER_IN_PARENT);
         sPostSdv.setLayoutParams(params);
+        sVideoView.setLayoutParams(params);
         float extraSpace = (UIHelper.screenHeight(getContext()) - size.height) / 2;
 
         if (postModel.getCaption().isEmpty()) {
@@ -125,7 +144,6 @@ public class SimpleImageViewer extends RelativeLayout {
             sCaptionTxt.setText(postModel.getCaption());
         }
 
-
         sWrapperRl.setTranslationY(UIHelper.screenHeight(getContext()));
         animateIn();
         postModel.loadPhoto(sPostSdv, new SimpleCallback2() {
@@ -134,6 +152,10 @@ public class SimpleImageViewer extends RelativeLayout {
 
             }
         });
+
+        if (postModel.getMedia_type() == 1){
+            loadVideo(postModel);
+        }
     }
 
     //Movement
@@ -323,6 +345,80 @@ public class SimpleImageViewer extends RelativeLayout {
                         callback.simpleImageViewerClose();
                     }
                 });
+    }
+
+    //Video
+    private void loadVideo(PostModel postModel) {
+        // callback.imageViewHolderVideoStarted(this);
+        this.sPlayLoaderV.startAnimating();
+        final SimpleImageViewer self = this;
+        postModel.fetchVideo((Activity) context, new PostModel.AsyncCallback() {
+            @Override
+            public void fileRetrieved(File file) {
+                System.out.println("FILE retrieved");
+                self.loadVideo2(file);
+            }
+        });
+    }
+
+    public void stopVideo() {
+        sVideoView.stopPlayback();
+        sVideoView.setVisibility(View.INVISIBLE);
+        sPostSdv.setVisibility(View.VISIBLE);
+        sPlayLoaderV.show();
+    }
+
+    public void loadVideo2(File file) {
+        sVideoView.setVisibility(View.VISIBLE);
+
+        if (mediaControls == null) {
+            mediaControls = new MediaController(context);
+        }
+        sVideoView.setOnCompletionListener(new MediaPlayer.OnCompletionListener() {
+            @Override
+            public void onCompletion(MediaPlayer mp) {
+                sVideoView.setVisibility(View.INVISIBLE);
+                sPostSdv.setVisibility(View.VISIBLE);
+                sPlayLoaderV.show();
+            }
+        });
+
+        sVideoView.setOnErrorListener(new MediaPlayer.OnErrorListener() {
+            @Override
+            public boolean onError(MediaPlayer mp, int what, int extra) {
+                System.out.println("ERROR");
+                mPlayerPosition = sVideoView.getCurrentPosition();
+
+                sVideoView.resume();
+
+                sVideoView.requestFocus();
+                return true;
+            }
+        });
+        sVideoView.setOnPreparedListener(new MediaPlayer.OnPreparedListener() {
+            @Override
+            public void onPrepared(MediaPlayer mp) {
+                mp.setOnInfoListener(new MediaPlayer.OnInfoListener() {
+                    @Override
+                    public boolean onInfo(MediaPlayer mp, int what, int extra) {
+                        if (what == MediaPlayer.MEDIA_INFO_VIDEO_RENDERING_START) {
+                            // video started; hide the placeholder.
+                            sPlayLoaderV.stopAnimating();
+                            sPostSdv.setVisibility(View.INVISIBLE);
+                            return true;
+                        }
+                        return false;
+                    }
+                });
+                mediaPlayer = mp;
+                mp.setLooping(true);
+
+                sVideoView.start();
+            }
+        });
+
+        sVideoView.setVideoPath(file.getAbsolutePath());
+        sVideoView.requestFocus();
     }
 
 }

@@ -5,4 +5,16 @@
     <string name="day_txt">day</string>
     <string name="week_txt">week</string>
     <string name="edit_hint">What\'s up?</string>
+
+    <string name="validation_username_space">No spaces, please</string>
+    <string name="validation_username_length">Must be between 4 and 15 characters</string>
+    <string name="validation_username_alphanumeric">Only numbers and letters from A-Z</string>
+    <string name="validation_username_exists">Already taken</string>
+    <string name="validation_password_incorrect">Wrong password</string>
+
+
+    <string name="validation_password_length">Must be between 6 and 20 characters</string>
+    <string name="validation_loc_pass">Does not match</string>
+    <string name="validation_loc_email">Not valid</string>
+
 </resources>

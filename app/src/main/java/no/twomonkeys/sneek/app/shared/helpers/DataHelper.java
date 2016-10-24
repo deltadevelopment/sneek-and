@@ -69,9 +69,10 @@ public class DataHelper {
 
     public static String getAuthToken() {
         // TODO: Rewrite this
-        //  SharedPreferences settings = context.getSharedPreferences(PREFS_NAME, 0);
-        //  String authToken = settings.getString("auth_token", "defaultStringIfNothingFound");
-        return "f383f4ad296fd296a8d955f389774492";
+        SharedPreferences settings = context.getSharedPreferences(PREFS_NAME, 0);
+        String authToken = settings.getString("auth_token", null);
+        //return "d389085148bfd1678041e634e12638ca";
+        return authToken;
     }
 
     public static boolean isBlocked(int userId) {

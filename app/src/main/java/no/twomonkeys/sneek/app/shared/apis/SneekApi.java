@@ -25,6 +25,9 @@ import retrofit2.http.Url;
 
 public interface SneekApi {
 
+    //Post
+    @POST("v1/post")
+    Call<ResponseModel> postPost(@Body HashMap<String, HashMap> body);
 
     // Feed
     @GET("v1/feed/following")
@@ -40,5 +43,17 @@ public interface SneekApi {
     @Headers("Content-Type: multipart/form-data;boundary=95416089-b2fd-4eab-9a14-166bb9c5788b")
     Call<ResponseBody> upload(@Url String url,
                               @Body RequestBody body);
+    //User
+    @POST("v1/user")
+    Call<ResponseModel> postUser(@Body HashMap<String, HashMap> body);
+
+    @GET("v1/user/username_exists/{username}")
+    Call<ResponseModel> getUsernameExists(
+            @Path("username") String username
+    );
+
+    //Login
+    @POST("v1/login")
+    Call<ResponseModel> postLogin(@Body HashMap<String, HashMap> body);
 
 }

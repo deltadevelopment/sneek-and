@@ -6,6 +6,7 @@ import android.graphics.drawable.Animatable;
 import android.graphics.drawable.BitmapDrawable;
 import android.graphics.drawable.Drawable;
 import android.net.Uri;
+import android.os.Bundle;
 import android.os.Environment;
 import android.support.annotation.Nullable;
 import android.util.Log;
@@ -21,12 +22,18 @@ import com.facebook.imagepipeline.image.QualityInfo;
 
 import java.io.File;
 import java.io.IOException;
+import java.util.Date;
+import java.util.HashMap;
 import java.util.Map;
 
 import no.twomonkeys.sneek.app.components.MainActivity;
+import no.twomonkeys.sneek.app.shared.NetworkCallback;
 import no.twomonkeys.sneek.app.shared.SimpleCallback2;
 import no.twomonkeys.sneek.app.shared.helpers.DataHelper;
+import no.twomonkeys.sneek.app.shared.helpers.DateHelper;
+import no.twomonkeys.sneek.app.shared.helpers.GenericContract;
 import no.twomonkeys.sneek.app.shared.helpers.MediaManager;
+import no.twomonkeys.sneek.app.shared.helpers.NetworkHelper;
 import no.twomonkeys.sneek.app.shared.helpers.PostArtifacts;
 import no.twomonkeys.sneek.app.shared.helpers.Size;
 import no.twomonkeys.sneek.app.shared.helpers.UIHelper;
@@ -36,7 +43,7 @@ import no.twomonkeys.sneek.app.shared.helpers.UIHelper;
  */
 
 public class PostModel extends CRUDModel {
-    private int id, media_type, caption_position, story_id, image_width, image_height, file_size;
+    private int id, media_type, caption_position, story_id, image_width, image_height, file_size, expireIndex;
     private String media_key, media_url, thumbnail_url, caption, body, created_at, expires_at;
     private boolean quarantine, pinned;
     private UserModel userModel;
@@ -51,6 +58,30 @@ public class PostModel extends CRUDModel {
 
     public PostModel(Map map) {
         build(map);
+    }
+
+    public PostModel() {
+
+    }
+
+    public static PostModel newMessageInstance(PostModel previousPostModel) {
+        PostModel postModel = new PostModel();
+        postModel.setMedia_type(2);
+        postModel.created_at = DateHelper.dateNowInString();
+
+        UserModel userModel = new UserModel();
+        userModel.setUsername("userDeviceUSername");
+
+        postModel.userModel = userModel;
+        //Need to check this when login is in place
+        previousPostModel.postArtifacts.isLastInDay = false;
+        previousPostModel.postArtifacts.sameUserNext = true;
+
+        postModel.postArtifacts = PostArtifacts.newInstance(true /*previousPostModel.id == DataHelper.getUserId()*/,
+                previousPostModel.media_type == 2,
+                DateHelper.isSameDayWithDates(DateHelper.dateForString(previousPostModel.getCreated_at()), new Date()));
+
+        return postModel;
     }
 
     @Override
@@ -74,7 +105,10 @@ public class PostModel extends CRUDModel {
         quarantine = booleanFromObject(map.get("quarantine"));
         pinned = booleanFromObject(map.get("pinned"));
 
-        userModel = new UserModel((Map) map.get("user"));
+        if (map.get("user") != null){
+            userModel = new UserModel((Map) map.get("user"));
+        }
+
 
         //This should be fixed later
         size = UIHelper.getOptimalSize(MainActivity.mActivity, image_width, image_height);
@@ -189,6 +223,41 @@ public class PostModel extends CRUDModel {
         }
     }
 
+    public void save(NetworkCallback ncb) {
+        if (media_type == 2) {
+            //Save message
+            this.body = body.length() > 500 ? body.substring(0, 499) : body;
+            HashMap innerMap = new HashMap();
+            innerMap.put("body", body);
+            innerMap.put("media_type", media_type);
+            innerMap.put("expires", expireIndex);
+
+            HashMap<String, HashMap> map = new HashMap();
+            map.put("post", innerMap);
+
+            NetworkHelper.sendRequest(NetworkHelper.getNetworkService().postPost(map),
+                    GenericContract.v1_post_post(),
+                    onDataReturned(),
+                    ncb);
+        } else {
+            //Save image
+
+        }
+    }
+
+    //setters
+
+    public void setMedia_type(int media_type) {
+        this.media_type = media_type;
+    }
+
+    public void setBody(String body) {
+        this.body = body;
+    }
+
+    public void setExpireIndex(int expireIndex) {
+        this.expireIndex = expireIndex;
+    }
 
     //Getters
 

@@ -84,13 +84,9 @@ public class FeedFragment extends Fragment implements EditView.Callback, Keyboar
         postSiv = (SimpleImageViewer) view.findViewById(R.id.postSiv);
         postSiv.addCallback(this);
 
-
         toolbarTitle = (TextView) view.findViewById(R.id.toolbar_title);
         Typeface type = Typeface.createFromAsset(getActivity().getAssets(), "arial-rounded-mt-bold.ttf");
         toolbarTitle.setTypeface(type);
-
-
-
         fetchFeed();
         return view;
     }
@@ -223,6 +219,25 @@ public class FeedFragment extends Fragment implements EditView.Callback, Keyboar
         int marginBottom = 50 + result;
         l.setMargins(0, 0, 0, UIHelper.dpToPx(getActivity(), 50) + result);
         mLayoutManager.scrollToPositionWithOffset(0, 0);
+    }
+
+    @Override
+    public void editViewDidPost(String postMsg) {
+        hideKeyboard();
+        PostModel postModel = PostModel.newMessageInstance(fAdapter.getLastPost());
+        postModel.setBody(postMsg);
+        postModel.setExpireIndex(0);
+
+        fAdapter.addPost(postModel);
+
+        postModel.save(new NetworkCallback() {
+            @Override
+            public void exec(ErrorModel errorModel) {
+                if (errorModel == null){
+                    System.out.println("POSTED MSG SUCCESS");
+                }
+            }
+        });
     }
 
     //KeyboardUtil delegate methods

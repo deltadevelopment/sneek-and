@@ -32,10 +32,12 @@ import com.facebook.drawee.generic.RoundingParams;
 import com.facebook.drawee.view.SimpleDraweeView;
 
 import java.io.File;
+import java.util.Date;
 
 import no.twomonkeys.sneek.R;
 import no.twomonkeys.sneek.app.components.MainActivity;
 import no.twomonkeys.sneek.app.shared.SimpleCallback2;
+import no.twomonkeys.sneek.app.shared.helpers.DataHelper;
 import no.twomonkeys.sneek.app.shared.helpers.DateHelper;
 import no.twomonkeys.sneek.app.shared.helpers.PostArtifacts;
 import no.twomonkeys.sneek.app.shared.helpers.Size;
@@ -66,6 +68,9 @@ public class ImageViewHolder extends RecyclerView.ViewHolder {
     Context context;
     boolean isVisible = true;
     boolean longPressing;
+    TextView iDateTxt;
+    LinearLayout userLayout;
+    RelativeLayout playLoaderRl;
 
     public interface Callback {
         public void imageViewHolderVideoStarted(ImageViewHolder imageViewHolder);
@@ -87,6 +92,9 @@ public class ImageViewHolder extends RecyclerView.ViewHolder {
         playLoaderV = getPlayLoaderV();
         postVideoView = getPostVideoView();
         videoViewRp = (View) itemView.findViewById(R.id.videoViewRp);
+        iDateTxt = (TextView) itemView.findViewById(R.id.iDateTxt);
+        userLayout = (LinearLayout) itemView.findViewById(R.id.userLayout);
+        playLoaderRl = (RelativeLayout) itemView.findViewById(R.id.playLoaderRl);
     }
 
     private SimpleDraweeView getDraweeView() {
@@ -220,48 +228,67 @@ public class ImageViewHolder extends RecyclerView.ViewHolder {
     }
 
 
-    public void updateHolder(Context context, PostModel postModel) {
+    public void updateHolder(Context context, final PostModel postModel) {
         this.context = context;
         this.postModel = postModel;
+        boolean rightAlignment = postModel.getUserModel().getId() == DataHelper.getUserId();
+        RelativeLayout.LayoutParams lp = (RelativeLayout.LayoutParams) userLayout.getLayoutParams();
         Size size = UIHelper.getOptimalSize(context, postModel.getImage_width(), postModel.getImage_height());
         RelativeLayout.LayoutParams params = new RelativeLayout.LayoutParams(200, RelativeLayout.LayoutParams.WRAP_CONTENT);
         params.width = (int) size.width;
         params.height = (int) size.height;
         params.setMargins(0, 0, 0, 0);
+        if (rightAlignment) {
+            params.addRule(RelativeLayout.ALIGN_PARENT_RIGHT);
+            lp.addRule(RelativeLayout.ALIGN_PARENT_RIGHT);
+        }
+        else{
+            params.addRule(RelativeLayout.ALIGN_PARENT_LEFT);
+            lp.addRule(RelativeLayout.ALIGN_PARENT_LEFT);
+        }
         draweeView.setLayoutParams(params);
         loadingRl.setLayoutParams(params);
-
-
-        FrameLayout.LayoutParams params2 = new FrameLayout.LayoutParams(200, FrameLayout.LayoutParams.WRAP_CONTENT);
-        params2.width = (int) size.width;
-        params2.height = (int) size.height;
-        params2.setMargins(0, 0, 0, 0);
+        playLoaderRl.setLayoutParams(params);
 
         postVideoView.setLayoutParams(params);
         videoViewRp.setLayoutParams(params);
 
         usernameTv.setText(postModel.getUserModel().getUsername());
         createdAtTv.setText(DateHelper.shortTime(postModel.getCreated_at()));
+        playLoaderV.setVisibility(View.INVISIBLE);
+
         postModel.loadPhoto(draweeView, new SimpleCallback2() {
             @Override
             public void callbackCall() {
                 loadingRl.setVisibility(View.GONE);
+                if (postModel.getMedia_type() == 1) {
+                    // playLoaderV.startAnimating();
+                    playLoaderV.setVisibility(View.VISIBLE);
+                } else {
+                    playLoaderV.setVisibility(View.INVISIBLE);
+                }
             }
         });
 
-        if (postModel.getMedia_type() == 1) {
-            // playLoaderV.startAnimating();
-            playLoaderV.setVisibility(View.VISIBLE);
-        } else {
-            playLoaderV.setVisibility(View.INVISIBLE);
-        }
 
         PostArtifacts artifacts = postModel.getPostArtifacts();
+
+        if (artifacts.isSameDay) {
+            iDateTxt.setVisibility(View.GONE);
+        } else {
+            iDateTxt.setVisibility(View.VISIBLE);
+            if (postModel.getCreated_at() != null) {
+                iDateTxt.setText(DateHelper.prettyMonthYear(postModel.getCreated_at()));
+                //[self.dateLabel setText:[DateHelper prettyStringFromDate3:createdAt]];
+                System.out.println("PRETTY " + DateHelper.prettyStringFromDate(postModel.getCreated_at()));
+            } else {
+                iDateTxt.setText(DateHelper.dateNowInString());
+            }
+        }
 
         int padding = UIHelper.dpToPx(MainActivity.mActivity, 10);
         int topPadding = padding;
         int bottomPadding = padding;
-
         if (artifacts.sameUserPrevious) {
             topPadding = 0;
         }
@@ -270,6 +297,9 @@ public class ImageViewHolder extends RecyclerView.ViewHolder {
             createdAtTv.setVisibility(View.GONE);
             bottomPadding = 0;
         } else {
+            if (artifacts.isLastInDay) {
+                bottomPadding = 0;
+            }
             usernameTv.setVisibility(View.VISIBLE);
             createdAtTv.setVisibility(View.VISIBLE);
         }
@@ -280,7 +310,8 @@ public class ImageViewHolder extends RecyclerView.ViewHolder {
         //roundingParams.setBorder(color, 1.0f);
         //roundingParams.setRoundAsCircle(true);
         //roundingParams.setCornersRadii(0, rounded, rounded, rounded);
-        float[] rectCorners = UIHelper.cornersForType(false, artifacts);
+
+        float[] rectCorners = UIHelper.cornersForType(rightAlignment, artifacts);
 
         roundingParams.setCornersRadii(rectCorners[0], rectCorners[1], rectCorners[2], rectCorners[3]);
 

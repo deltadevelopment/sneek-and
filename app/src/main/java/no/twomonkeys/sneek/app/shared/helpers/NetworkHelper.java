@@ -53,7 +53,7 @@ public class NetworkHelper {
         if (authToken != auth_token)
         {
             auth_token = authToken;
-            networkService = ServiceGenerator.createService(SneekApi.class, "d389085148bfd1678041e634e12638ca");
+            networkService = ServiceGenerator.createService(SneekApi.class, DataHelper.getAuthToken());
         }
 
         return networkService;

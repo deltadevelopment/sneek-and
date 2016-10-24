@@ -1,13 +1,18 @@
 package no.twomonkeys.sneek.app.shared.helpers;
 
 import android.content.Context;
+import android.graphics.Paint;
 import android.graphics.Point;
 import android.graphics.Rect;
+import android.graphics.Typeface;
 import android.util.DisplayMetrics;
 import android.util.Log;
 import android.view.Display;
 import android.view.WindowManager;
+import android.widget.Button;
+import android.widget.RelativeLayout;
 
+import no.twomonkeys.sneek.R;
 import no.twomonkeys.sneek.app.components.MainActivity;
 
 /**
@@ -190,6 +195,40 @@ public class UIHelper {
             }
         }
         return rectCorners;
+    }
+
+    public static void layoutBtnRelative(Context c, Button btn, String title) {
+        btn.setBackgroundColor(c.getResources().getColor(R.color.blackColor));
+        btn.setTextColor(c.getResources().getColor(R.color.white));
+        btn.setTypeface(Typeface.create("HelveticaNeue", 0));
+
+        btn.setText(title);
+        int margin = UIHelper.dpToPx(c, 5);
+        int btnHeight = UIHelper.dpToPx(c, 30);
+
+
+        RelativeLayout.LayoutParams params = new RelativeLayout.LayoutParams(20, RelativeLayout.LayoutParams.WRAP_CONTENT);
+        params.height = btnHeight;
+
+        params.setMargins(0, margin * 2, 0, 0);
+
+        Paint paint = new Paint();
+        Rect bounds = new Rect();
+
+        int text_height = 0;
+        int text_width = 0;
+
+        paint.setTypeface(btn.getTypeface());// your preference here
+        paint.setTextSize(btn.getTextSize());// have this the same as your text size
+
+        String text = btn.getText().toString();
+
+        paint.getTextBounds(text, 0, text.length(), bounds);
+
+        text_height = bounds.height();
+        text_width = bounds.width() + (margin * 2) + 10;
+        params.width = text_width;
+        btn.setLayoutParams(params);
     }
 
 }

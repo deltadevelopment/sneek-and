@@ -6,7 +6,9 @@ import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.Calendar;
 import java.util.Date;
+import java.util.Locale;
 import java.util.TimeZone;
+import java.util.concurrent.TimeUnit;
 
 /**
  * 26/09/16 by simenlie
@@ -80,7 +82,7 @@ public class DateHelper {
         long difference = dateOne.getTime() - dateTwo.getTime();
         long seconds = difference / 1000;
         long minutes = seconds / 60;
-       // Log.v("MIn","minutes is " + minutes + " " + dateOne.toString()+ " " + dateTwo.toString());
+        // Log.v("MIn","minutes is " + minutes + " " + dateOne.toString()+ " " + dateTwo.toString());
         if (minutes > 5) {
             return false;
         }
@@ -109,7 +111,6 @@ public class DateHelper {
 
         return sameDay;
     }
-
 
 
     public static String shortTimeSince(String date) {
@@ -149,5 +150,112 @@ public class DateHelper {
         }
         return null;
     }
+
+    //Pretty dates
+
+    public static String prettyStringFromDate(String dateString) {
+        SimpleDateFormat formatter = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSS'Z'");
+        formatter.setTimeZone(TimeZone.getTimeZone("UTC"));
+
+        try {
+            Date date1 = formatter.parse(dateString);
+
+            Calendar cal2 = Calendar.getInstance();
+            cal2.setTime(date1);
+            int day = cal2.get(Calendar.DAY_OF_WEEK);
+            int month = cal2.get(Calendar.MONTH);
+            int hour = cal2.get(Calendar.HOUR);
+            int minutes = cal2.get(Calendar.MINUTE);
+
+
+            SimpleDateFormat month_date = new SimpleDateFormat("MMMM");
+            String monthName = month_date.format(cal2.getTime());
+
+            String hourString = hour < 10 ? hour + "0" : hour + "";
+            String minuteString = minutes < 10 ? minutes + "0" : minutes + "";
+
+            String finalString = day + " " + monthName + " " + hourString + "." + minuteString;
+
+            return finalString;
+        } catch (ParseException e) {
+            e.printStackTrace();
+        }
+
+        return "";
+    }
+
+    public static String prettyMonthYear(String dateString) {
+        SimpleDateFormat formatter = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSS'Z'");
+        formatter.setTimeZone(TimeZone.getTimeZone("UTC"));
+
+        try {
+            Date date1 = formatter.parse(dateString);
+
+            Calendar cal2 = Calendar.getInstance();
+            cal2.setTime(date1);
+            int day = cal2.get(Calendar.DAY_OF_MONTH);
+            int month = cal2.get(Calendar.MONTH);
+            int year = cal2.get(Calendar.YEAR);
+            int hour = cal2.get(Calendar.HOUR);
+            int minutes = cal2.get(Calendar.MINUTE);
+
+
+            SimpleDateFormat month_date = new SimpleDateFormat("MMMM");
+            String monthName = month_date.format(cal2.getTime());
+
+
+            Date dateNow = new Date();
+            long diffInMs = dateNow.getTime() - date1.getTime();
+
+            long diffInSec = TimeUnit.MILLISECONDS.toSeconds(diffInMs);
+
+            int seconds = (int) diffInSec;
+            int minutes2 = seconds / 60;
+            int hours = minutes2 / 60;
+            int days = hours / 24;
+
+            if (days < 6) {
+                return prettyDayOfWeek(dateString);
+            }
+
+            String finalString = monthName + " " + day + ", " + year;
+
+            return finalString;
+        } catch (ParseException e) {
+            e.printStackTrace();
+        }
+
+        return "";
+    }
+
+
+    public static String prettyDayOfWeek(String dateString) {
+        SimpleDateFormat formatter = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSS'Z'");
+        formatter.setTimeZone(TimeZone.getTimeZone("UTC"));
+
+        try {
+            Date date1 = formatter.parse(dateString);
+
+            Calendar cal2 = Calendar.getInstance();
+            cal2.setTime(date1);
+            int weekDay = cal2.get(Calendar.DAY_OF_WEEK);
+            int hour = cal2.get(Calendar.HOUR);
+            int minutes = cal2.get(Calendar.MINUTE);
+
+            SimpleDateFormat dayFormat = new SimpleDateFormat("EEEE", Locale.US);
+            String dayName = dayFormat.format(cal2.getTime());
+
+            if (isSameDayWithDates(date1, new Date())) {
+                dayName = "Today";
+            }
+
+            return dayName;
+        } catch (ParseException e) {
+            e.printStackTrace();
+        }
+
+        return "";
+    }
+
 
 }

@@ -24,4 +24,16 @@ public class PostArtifacts {
         this.isLastInDay = false;
         this.isLastSeen = false;
     }
+
+    public static PostArtifacts newInstance(boolean sameUserPrevious, boolean previousIsMessage, boolean isSameDay)
+    {
+        PostArtifacts postArtifacts = new PostArtifacts();
+        postArtifacts.sameUserPrevious = sameUserPrevious;
+        postArtifacts.previousIsMessage = previousIsMessage;
+        postArtifacts.isSameDay = isSameDay;
+        postArtifacts.isLastInDay = true;
+        postArtifacts.isLastSeen = true;
+
+        return postArtifacts;
+    }
 }

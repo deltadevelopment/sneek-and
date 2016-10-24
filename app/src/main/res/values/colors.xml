@@ -19,4 +19,6 @@
     <color name="editShadowGrey">#50D9D9D9</color>
     <color name="toolbarGrey">#999999</color>
     <color name="whiteTrsp">#F2FFFFFF</color>
+    <color name="dateTxt">#DDDDDD</color>
+
 </resources>

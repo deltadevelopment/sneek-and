@@ -57,7 +57,19 @@ public class GenericContract {
         return new Contract() {
             @Override
             public Map generic_contract(Map map) {
+                System.out.println("MAP returned: " + map);
                 return map;
+            }
+        };
+    }
+
+    public static Contract v1_post_post() {
+        return new Contract() {
+            @Override
+            public Map generic_contract(Map map) {
+                Map newMap = (Map) map.get("post");
+
+                return newMap;
             }
         };
     }

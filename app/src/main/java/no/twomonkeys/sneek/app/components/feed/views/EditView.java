@@ -3,10 +3,12 @@ package no.twomonkeys.sneek.app.components.feed.views;
 import android.content.Context;
 import android.graphics.Typeface;
 import android.os.Handler;
+import android.support.v4.content.ContextCompat;
 import android.text.Editable;
 import android.text.TextWatcher;
 import android.util.AttributeSet;
 import android.view.LayoutInflater;
+import android.view.View;
 import android.widget.EditText;
 import android.widget.ImageButton;
 import android.widget.LinearLayout;
@@ -27,12 +29,15 @@ public class EditView extends RelativeLayout {
     RelativeLayout editRl;
     LinearLayout toolbarLl;
     int originalHeight;
+    ImageButton sendBtn;
 
     Handler handler;
     Runnable r;
 
     public interface Callback {
         void editViewSizeChange(int sizeChange);
+
+        void editViewDidPost(String postMsg);
     }
 
     public void addCallback(Callback callback) {
@@ -69,6 +74,24 @@ public class EditView extends RelativeLayout {
         originalHeight = editRl.getHeight();
         this.cameraBtn = getCameraBtn();
         toolbarLl = (LinearLayout) findViewById(R.id.toolbarLl);
+        this.sendBtn = getSendBtn();
+
+    }
+
+    public ImageButton getSendBtn() {
+        if (this.sendBtn == null) {
+            ImageButton sendBtn = (ImageButton) findViewById(R.id.send_button);
+            sendBtn.setVisibility(GONE);
+            sendBtn.setOnClickListener(new OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    callback.editViewDidPost(editEt.getText().toString());
+                    editEt.setText("");
+                }
+            });
+            this.sendBtn = sendBtn;
+        }
+        return this.sendBtn;
     }
 
     public ImageButton getCameraBtn() {
@@ -93,10 +116,12 @@ public class EditView extends RelativeLayout {
                 public void onTextChanged(CharSequence s, int start, int before, int count) {
                     if (editEt.getText().length() > 0) {
                         editEt.setTypeface(Typeface.DEFAULT);
+                        sendBtn.setImageDrawable(ContextCompat.getDrawable(context, R.drawable.sendx3));
 
                     } else {
                         Typeface type = Typeface.createFromAsset(context.getAssets(), "arial-rounded-mt-bold.ttf");
                         editEt.setTypeface(type);
+                        sendBtn.setImageDrawable(ContextCompat.getDrawable(context, R.drawable.senddisabledx3));
                     }
                 }
 
@@ -129,10 +154,11 @@ public class EditView extends RelativeLayout {
         System.out.println("STARTED EDITE MODE");
         cameraBtn.setVisibility(INVISIBLE);
         toolbarLl.setVisibility(VISIBLE);
+        this.sendBtn.setVisibility(VISIBLE);
 
         LayoutParams lp = (RelativeLayout.LayoutParams) editEt.getLayoutParams();
         LayoutParams lp2 = (RelativeLayout.LayoutParams) cameraBtn.getLayoutParams();
-        editEt.setPadding(0,0,0,UIHelper.dpToPx(getContext(), 40));
+        editEt.setPadding(0, 0, 0, UIHelper.dpToPx(getContext(), 40));
         //lp.setMargins(0, 0, 0, UIHelper.dpToPx(getContext(), 40));
         //lp2.setMargins(0, 0, 0, UIHelper.dpToPx(getContext(), 50));
         editEt.setCursorVisible(true);
@@ -141,10 +167,10 @@ public class EditView extends RelativeLayout {
     public void editModeEnded() {
         cameraBtn.setVisibility(VISIBLE);
         toolbarLl.setVisibility(INVISIBLE);
-        editEt.setPadding(0,0,0,UIHelper.dpToPx(getContext(), 0));
+        this.sendBtn.setVisibility(INVISIBLE);
+        editEt.setPadding(0, 0, 0, UIHelper.dpToPx(getContext(), 0));
         editEt.setCursorVisible(false);
     }
-
 
 
 }

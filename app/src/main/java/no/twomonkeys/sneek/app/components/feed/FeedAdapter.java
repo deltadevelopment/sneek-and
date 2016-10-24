@@ -25,6 +25,17 @@ public class FeedAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> i
         this.posts = posts;
     }
 
+    public void addPost(PostModel postModel)
+    {
+        posts.add(0,postModel);
+        notifyDataSetChanged();
+    }
+
+    public PostModel getLastPost()
+    {
+        return this.posts.get(0);
+    }
+
     public interface Callback {
         public void feedAdapterTap(PostModel postModel);
     }

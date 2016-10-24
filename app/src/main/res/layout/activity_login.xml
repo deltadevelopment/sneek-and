@@ -1,0 +1,173 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/rootLogin"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="@color/white"
+    android:paddingBottom="0dp"
+    android:paddingLeft="0dp"
+    android:paddingRight="0dp"
+    android:paddingTop="0dp"
+    tools:context=".app.components.login.LoginActivity">
+
+
+
+    <RelativeLayout
+        android:id="@+id/usernameScreen"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:background="@color/white">
+
+
+        <EditText
+            android:id="@+id/usernameEditText"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_alignParentBottom="true"
+            android:layout_centerHorizontal="true"
+            android:layout_centerInParent="true"
+            android:layout_marginBottom="140dp"
+            android:layout_marginLeft="10dp"
+            android:layout_marginRight="60dp"
+            android:layout_marginTop="60dp"
+            android:background="@color/white"
+            android:ellipsize="start"
+            android:gravity="center"
+            android:textAlignment="center"
+            android:hint="username"
+            android:imeOptions="actionNone"
+            android:inputType="textNoSuggestions"
+            android:lines="2"
+            android:maxLength="75"
+            android:maxLines="2"
+            android:padding="5dp"
+            android:privateImeOptions="nm"
+            android:textColor="@color/blackColor"
+            android:textColorHint="@color/cameraGrey"
+            android:textCursorDrawable="@drawable/color_cursor"
+            android:textSize="25dp" />
+
+
+        <Button
+            android:id="@+id/registerBtn"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_alignParentBottom="true"
+            android:layout_alignParentRight="true"
+            android:layout_marginBottom="30dp"
+            android:background="@color/transparent"
+            android:text="Register"
+            android:textAllCaps="false"
+            android:textColor="@color/blackColor"
+            android:textSize="25dp" />
+
+        <Button
+            android:id="@+id/loginBtn"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_alignParentBottom="true"
+            android:layout_marginBottom="30dp"
+            android:background="@color/transparent"
+            android:text="Login"
+            android:textAllCaps="false"
+            android:textColor="@color/blackColor"
+            android:textSize="25dp" />
+
+
+        <TextView
+            android:id="@+id/loginErrorTxt"
+            android:layout_width="match_parent"
+            android:layout_height="50dp"
+            android:layout_alignParentBottom="true"
+            android:layout_centerVertical="true"
+            android:layout_marginBottom="80dp"
+            android:gravity="center"
+            android:text="test"
+            android:textAlignment="center"
+            android:textColor="@color/themeColor" />
+
+       <!-- <no.twomonkeys.sneek.app.shared.views.LoadingView
+            android:id="@+id/loginLoadingView"
+            android:layout_width="30dp"
+            android:layout_height="30dp"
+            android:layout_alignBottom="@+id/usernameEditText"
+            android:layout_centerHorizontal="true"
+
+            android:background="@color/transparent"
+            android:gravity="center"
+            android:orientation="horizontal">
+
+        </no.twomonkeys.sneek.app.shared.views.LoadingView>-->
+        <ProgressBar
+            android:id="@+id/lprogressBar"
+            android:layout_width="30dp"
+            android:layout_height="30dp"
+            android:layout_alignBottom="@+id/usernameEditText"
+            android:layout_centerInParent="true" />
+
+
+
+    </RelativeLayout>
+
+    <RelativeLayout
+        android:id="@+id/ageScreen"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:visibility="gone">
+
+        <no.twomonkeys.sneek.app.shared.views.CustomNumberPicker
+            android:id="@+id/customNumberPicker"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_centerInParent="true">
+
+        </no.twomonkeys.sneek.app.shared.views.CustomNumberPicker>
+
+        <Button
+            android:id="@+id/kissBtn"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_alignParentBottom="true"
+            android:layout_centerHorizontal="true"
+            android:layout_marginBottom="80dp"
+            android:background="@color/transparent"
+            android:text="KISS"
+            android:textAllCaps="false"
+            android:textColor="@color/white"
+            android:textSize="25dp" />
+
+    </RelativeLayout>
+
+    <no.twomonkeys.sneek.app.shared.views.LoadingView
+        android:id="@+id/mainLoadingView"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:layout_alignParentBottom="true"
+        android:layout_centerHorizontal="true"
+        android:background="@color/blackColor"
+        android:gravity="center"
+        android:orientation="horizontal"
+        android:visibility="gone"></no.twomonkeys.sneek.app.shared.views.LoadingView>
+
+    <no.twomonkeys.sneek.app.components.web.WebController
+        android:id="@+id/webControllerLogin"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:visibility="gone">
+
+    </no.twomonkeys.sneek.app.components.web.WebController>
+
+    <ImageButton
+        android:id="@+id/loginBackBtn"
+        android:layout_width="50dp"
+        android:layout_height="50dp"
+        android:padding="15dp"
+        android:src="@drawable/backxblack"
+        android:scaleType="fitCenter"
+        android:layout_marginLeft="0dp"
+        android:layout_marginTop="10dp"
+        android:background="@null" />
+
+
+</RelativeLayout>

@@ -12,6 +12,17 @@
         android:id="@+id/sWrapperRl"
         android:layout_width="match_parent"
         android:layout_height="match_parent">
+
+        <no.twomonkeys.sneek.app.shared.views.SneekVideoView
+            android:id="@+id/sVideoView"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_centerInParent="true"
+            android:layout_centerVertical="true"
+            android:visibility="invisible"
+            android:background="@color/transparent"/>
+
+
         <com.facebook.drawee.view.SimpleDraweeView xmlns:fresco="http://schemas.android.com/apk/res-auto"
             android:id="@+id/sPostSdv"
             android:layout_width="fill_parent"
@@ -20,6 +31,14 @@
             android:adjustViewBounds="true"
             android:background="@color/blackColor"
             android:scaleType="fitCenter" />
+
+        <no.twomonkeys.sneek.app.shared.views.PlayLoaderView
+            android:id="@+id/sPlayLoaderV"
+            android:layout_width="50dp"
+            android:layout_height="50dp"
+            android:layout_centerInParent="true">
+        </no.twomonkeys.sneek.app.shared.views.PlayLoaderView>
+
         <!--The y translation of this textview is set manually in code-->
         <TextView
             android:id="@+id/sCaptionTxt"
