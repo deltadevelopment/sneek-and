@@ -1,6 +1,7 @@
 package no.twomonkeys.sneek.app.components;
 
 import android.app.Activity;
+import android.app.FragmentTransaction;
 import android.content.Context;
 import android.content.pm.ActivityInfo;
 import android.graphics.Typeface;
@@ -12,8 +13,11 @@ import android.support.v4.app.FragmentPagerAdapter;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.support.v7.widget.Toolbar;
+import android.telecom.Call;
 import android.view.View;
+import android.view.WindowManager;
 import android.view.animation.AccelerateInterpolator;
+import android.widget.RelativeLayout;
 import android.widget.TextView;
 
 import com.facebook.cache.disk.DiskCacheConfig;
@@ -27,16 +31,18 @@ import no.twomonkeys.sneek.R;
 import no.twomonkeys.sneek.app.components.camera.CameraFragment;
 import no.twomonkeys.sneek.app.components.feed.FeedFragment;
 import no.twomonkeys.sneek.app.components.friends.FriendsFragment;
+import no.twomonkeys.sneek.app.components.main.MainPagerAdapter;
 import no.twomonkeys.sneek.app.shared.helpers.CacheKeyFactory;
+import no.twomonkeys.sneek.app.shared.models.PostModel;
 
-public class MainActivity extends AppCompatActivity implements FeedFragment.Callback {
-    FragmentPagerAdapter adapterViewPager;
+public class MainActivity extends AppCompatActivity implements CameraFragment.Callback, MainPagerAdapter.Callback {
+    MainPagerAdapter adapterViewPager;
 
     public static Activity mActivity;
 
     private ViewPager vpPager;
     private CameraFragment cameraFragment;
-    private CameraFragment feedFragment;
+    private FeedFragment feedFragment;
     static String TAG = "MainActivity";
     //TextView toolbarTitle;
     //Toolbar toolbar;
@@ -50,6 +56,7 @@ public class MainActivity extends AppCompatActivity implements FeedFragment.Call
         vpPager = (ViewPager) findViewById(R.id.vpPager);
         vpPager.setSwipeable(true);
         adapterViewPager = new MainPagerAdapter(getSupportFragmentManager(), this);
+        adapterViewPager.addCallback(this);
 /*
         toolbarTitle = (TextView) findViewById(R.id.toolbar_title);
         Typeface type = Typeface.createFromAsset(getAssets(), "arial-rounded-mt-bold.ttf");
@@ -84,9 +91,21 @@ public class MainActivity extends AppCompatActivity implements FeedFragment.Call
         vpPager.setAdapter(adapterViewPager);
 
         //Camera
-        //getFragmentManager().beginTransaction().add(R.id.mainLayout, new CameraFragment()).commit();
-        //cameraFragment = (CameraFragment) getFragmentManager().findFragmentById(R.id.cameraFragment);
+        //getFragmentManager().beginTransaction().add(R.id.main, new CameraFragment()).commit();
+        cameraFragment = (CameraFragment) getFragmentManager().findFragmentById(R.id.cameraFragment);
+        cameraFragment.addCallback(this);
+        //cameraFragment.hide();
+
+
     }
+
+    public void replaceFragment(android.app.Fragment someFragment) {
+        FragmentTransaction transaction = getFragmentManager().beginTransaction();
+        transaction.replace(R.id.fragment_container, someFragment);
+        transaction.addToBackStack(null);
+        transaction.commit();
+    }
+
 
     public void setSwipeable(boolean swipeable) {
         vpPager.setSwipeable(swipeable);
@@ -158,41 +177,29 @@ public class MainActivity extends AppCompatActivity implements FeedFragment.Call
         //toolbar.setVisibility(View.VISIBLE);
     }
 
-    public static class MainPagerAdapter extends FragmentPagerAdapter {
-        private static int NUM_ITEMS = 2;
-        private Activity activity;
+    @Override
+    public void feedFragmentOnCameraClicked() {
+        //getFragmentManager().beginTransaction().add(R.id.main, new CameraFragment()).commit();
+        //cameraFragment = (CameraFragment) getFragmentManager().findFragmentById(R.id.cameraFragment);
+        getWindow().setFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN, WindowManager.LayoutParams.FLAG_FULLSCREEN);
+        RelativeLayout rl = (RelativeLayout) findViewById(R.id.fragment_container);
+        rl.setVisibility(View.VISIBLE);
+        //CameraFragment cf = new CameraFragment();
 
-        public MainPagerAdapter(FragmentManager fragmentManager, Activity activity) {
-            super(fragmentManager);
-            this.activity = activity;
-        }
-
-        @Override
-        public int getCount() {
-            return NUM_ITEMS;
-        }
-
-        @Override
-        public Fragment getItem(int position) {
-            switch (position) {
-                case 0:
-                    return FriendsFragment.newInstance();
-                case 1:
-                    FeedFragment ff = FeedFragment.newInstance();
-                    ff.addCallback((FeedFragment.Callback) activity);
-                    return ff;
-                default:
-                    return null;
-            }
-        }
-
+        //    replaceFragment(cf);
     }
 
-
-/*
-    public Toolbar getToolbar() {
-        return toolbar;
+    @Override
+    public void cameraFragmentTappedClose() {
+        RelativeLayout rl = (RelativeLayout) findViewById(R.id.fragment_container);
+        rl.setVisibility(View.GONE);
+        getWindow().clearFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN);
     }
-*/
+
+    @Override
+    public void cameraFragmentDidPost(PostModel postModel) {
+        cameraFragmentTappedClose();
+        adapterViewPager.getFeedFragment().addNewImagePost(postModel);
+    }
 }
 

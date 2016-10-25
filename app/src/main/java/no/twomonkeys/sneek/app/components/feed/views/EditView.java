@@ -36,8 +36,8 @@ public class EditView extends RelativeLayout {
 
     public interface Callback {
         void editViewSizeChange(int sizeChange);
-
         void editViewDidPost(String postMsg);
+        void editViewDidClickCamera();
     }
 
     public void addCallback(Callback callback) {
@@ -97,6 +97,13 @@ public class EditView extends RelativeLayout {
     public ImageButton getCameraBtn() {
         if (this.cameraBtn == null) {
             ImageButton cameraBtn = (ImageButton) findViewById(R.id.editCameraBtn);
+            cameraBtn.setOnClickListener(new OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    System.out.println("Clicked now");
+                    callback.editViewDidClickCamera();
+                }
+            });
             this.cameraBtn = cameraBtn;
         }
         return cameraBtn;

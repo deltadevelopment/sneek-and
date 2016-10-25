@@ -10,6 +10,8 @@ import android.view.ViewGroup;
 import android.widget.ImageView;
 import android.widget.TextView;
 
+import com.facebook.drawee.view.SimpleDraweeView;
+
 import java.util.ArrayList;
 import java.util.Random;
 
@@ -17,6 +19,8 @@ import no.twomonkeys.sneek.R;
 import no.twomonkeys.sneek.app.components.feed.ImageViewHolder;
 import no.twomonkeys.sneek.app.shared.models.FollowingModel;
 import no.twomonkeys.sneek.app.shared.models.PostModel;
+import no.twomonkeys.sneek.app.shared.models.SuggestionModel;
+import no.twomonkeys.sneek.app.shared.models.UserModel;
 import retrofit2.http.HEAD;
 
 /**
@@ -28,46 +32,54 @@ class FriendsAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> imple
 
     public interface Callback {
         void adapterDidClickSuggestion();
+
         void adapterDidClickFollowing();
     }
 
     private Callback callback;
+    private boolean isSuggestions;
 
     public void addCallback(Callback callback) {
         this.callback = callback;
     }
 
-    private ArrayList<FollowingModel> followings;
+    private ArrayList<UserModel> followings;
+    private ArrayList<UserModel> suggestions;
 
     private Context mContext;
 
-    FriendsAdapter(ArrayList<FollowingModel> followings) {
+    FriendsAdapter() {
+    }
+
+    public void setFollowings(ArrayList<UserModel> followings) {
         this.followings = followings;
+    }
+
+    public void setSuggestions(ArrayList<UserModel> suggestions) {
+        this.suggestions = suggestions;
     }
 
     @Override
     public void headerDidTapSuggestion() {
-        callback.adapterDidClickSuggestion();
+        this.isSuggestions = true;
+        if (this.suggestions == null) {
+            callback.adapterDidClickSuggestion();
+        } else {
+            this.notifyDataSetChanged();
+        }
     }
 
     @Override
     public void headerDidTapFollowing() {
-        callback.adapterDidClickFollowing();
-    }
-
-    static class ViewHolder extends RecyclerView.ViewHolder {
-
-        TextView firstLettersTv;
-        ImageView imageCircleIv;
-        TextView usernameTv;
-
-        ViewHolder(View view) {
-            super(view);
-            usernameTv = (TextView) view.findViewById(R.id.username);
-            imageCircleIv = (ImageView) view.findViewById(R.id.imageCircle);
-            firstLettersTv = (TextView) view.findViewById(R.id.usernameFirstLetters);
+        this.isSuggestions = false;
+        if (followings == null) {
+            callback.adapterDidClickFollowing();
+        } else {
+            this.notifyDataSetChanged();
         }
+
     }
+
 
     @Override
     public int getItemViewType(int position) {
@@ -86,7 +98,7 @@ class FriendsAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> imple
             return new HeaderViewHolder(view);
         } else {
             View view = LayoutInflater.from(mContext).inflate(R.layout.row_item_friends, parent, false);
-            return new ViewHolder(view);
+            return new FriendsViewHolder(view);
         }
     }
 
@@ -97,25 +109,20 @@ class FriendsAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> imple
             hHolder.addCallback(this);
             hHolder.update(this.mContext);
         } else {
-            FollowingModel following = followings.get(position - 1);
-            ViewHolder vholder = (ViewHolder) holder;
-            vholder.usernameTv.setText(following.getFollowee().getUsername());
-            vholder.firstLettersTv.setText(following.getFollowee().getUsername().substring(0, 2));
-            setRandomColor(vholder);
+            UserModel following = isSuggestions ? suggestions.get(position - 1) : followings.get(position - 1);
+            FriendsViewHolder vholder = (FriendsViewHolder) holder;
+            vholder.update(this.mContext, following);
         }
     }
 
     @Override
     public int getItemCount() {
-        return followings.size() + 1;
+        if (isSuggestions) {
+            return suggestions != null ? suggestions.size() + 1 : 0;
+        }
+        return followings != null ? followings.size() + 1 : 0;
     }
 
-    private void setRandomColor(ViewHolder holder) {
-        int[] colors = {R.color.circleBlue, R.color.circleGreen, R.color.circleGrey, R.color.circleRed};
 
-        GradientDrawable background = (GradientDrawable) holder.imageCircleIv.getBackground();
-        Random r = new Random();
-        background.setColor(ContextCompat.getColor(mContext, colors[r.nextInt(4)]));
-    }
 
 }

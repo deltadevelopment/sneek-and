@@ -51,7 +51,6 @@ class CameraPreview extends ViewGroup implements SurfaceHolder.Callback {
     }
 
 
-
     public void setCamera(Camera camera) {
         if (mCamera == camera) {
             return;
@@ -110,7 +109,7 @@ class CameraPreview extends ViewGroup implements SurfaceHolder.Callback {
     }
 
     //onMeasure() is your opportunity to tell Android how big you want
-    //your custom view to be dependent the layout constraints provided by the parent
+    //your custom view to be dependent on the layout constraints provided by the parent
     @Override
     protected void onMeasure(int widthMeasureSpec, int heightMeasureSpec) {
         final int width = resolveSize(getSuggestedMinimumWidth(), widthMeasureSpec);
@@ -121,9 +120,11 @@ class CameraPreview extends ViewGroup implements SurfaceHolder.Callback {
             mPreviewSize = getOptimalPreviewSize(mSupportedPreviewSizes, width, height);
         }
         if (mCamera != null) {
+            System.out.println("Trying to set parameters " + mPreviewSize.height + " :: " + mPreviewSize.width);
             Camera.Parameters parameters = mCamera.getParameters();
             parameters.setPreviewSize(mPreviewSize.width, mPreviewSize.height);
             parameters.setPictureSize(mPreviewSize.width, mPreviewSize.height);
+            //1200 :: 1600
             mCamera.setParameters(parameters);
         }
     }
@@ -244,8 +245,9 @@ class CameraPreview extends ViewGroup implements SurfaceHolder.Callback {
                 mCamera.setDisplayOrientation(cameraOrientation);
                 Camera.Parameters parameters = mCamera.getParameters();
                 parameters.setRotation(cameraOrientation);
-                parameters.setPreviewSize(mPreviewSize.width,mPreviewSize.height);
+                parameters.setPreviewSize(mPreviewSize.width, mPreviewSize.height);
                 parameters.setPictureSize(mPreviewSize.width, mPreviewSize.height);
+                System.out.println("Trying to set camera params 2");
                 mCamera.setParameters(parameters);
             } catch (IOException e) {
                 e.printStackTrace();
@@ -256,7 +258,7 @@ class CameraPreview extends ViewGroup implements SurfaceHolder.Callback {
     }
 
     public static int setCameraDisplayOrientation(Activity activity,
-                                                   int cameraId, android.hardware.Camera camera) {
+                                                  int cameraId, android.hardware.Camera camera) {
         android.hardware.Camera.CameraInfo info =
                 new android.hardware.Camera.CameraInfo();
         android.hardware.Camera.getCameraInfo(cameraId, info);
@@ -264,10 +266,18 @@ class CameraPreview extends ViewGroup implements SurfaceHolder.Callback {
                 .getRotation();
         int degrees = 0;
         switch (rotation) {
-            case Surface.ROTATION_0: degrees = 0; break;
-            case Surface.ROTATION_90: degrees = 90; break;
-            case Surface.ROTATION_180: degrees = 180; break;
-            case Surface.ROTATION_270: degrees = 270; break;
+            case Surface.ROTATION_0:
+                degrees = 0;
+                break;
+            case Surface.ROTATION_90:
+                degrees = 90;
+                break;
+            case Surface.ROTATION_180:
+                degrees = 180;
+                break;
+            case Surface.ROTATION_270:
+                degrees = 270;
+                break;
         }
 
         int result;

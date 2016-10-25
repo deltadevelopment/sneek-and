@@ -4,9 +4,14 @@
         <!-- Customize your theme here. -->
         <item name="colorPrimary">@color/white</item>
         <item name="colorPrimaryDark">@color/cameraGrey</item>
-        <item name="colorAccent">@color/colorAccent</item>
+        <item name="colorAccent">@color/white</item>
         <item name="android:textColorPrimary">@color/colorPrimaryDark</item>
-        <item name="android:textColor">@color/themeColor</item>
+        <item name="android:textColor">@color/blackColor</item>
         <item name="android:windowContentOverlay">@null</item>
+        <item name="android:colorBackground">@color/white</item>
     </style>
+
+
+
+
 </resources>

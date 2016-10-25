@@ -3,6 +3,8 @@ package no.twomonkeys.sneek.app.components.camera;
 import android.app.Fragment;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
+import android.graphics.drawable.BitmapDrawable;
+import android.media.Image;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.v4.content.ContextCompat;
@@ -33,10 +35,12 @@ import no.twomonkeys.sneek.app.components.filters.IFBrannanFilter;
 import no.twomonkeys.sneek.app.components.filters.IFInkwellFilter;
 import no.twomonkeys.sneek.app.components.filters.IFWaldenFilter;
 import no.twomonkeys.sneek.app.shared.NetworkCallback;
+import no.twomonkeys.sneek.app.shared.SimpleCallback2;
 import no.twomonkeys.sneek.app.shared.helpers.DiskHelper;
 import no.twomonkeys.sneek.app.shared.helpers.GraphicsHelper;
 import no.twomonkeys.sneek.app.shared.helpers.UIHelper;
 import no.twomonkeys.sneek.app.shared.models.ErrorModel;
+import no.twomonkeys.sneek.app.shared.models.PostModel;
 
 /**
  * Created by simenlie on 05.10.2016.
@@ -61,7 +65,9 @@ public class CameraEditFragment extends Fragment {
     private boolean movingBackwards;
     private float filterTuning;
     GPUImageContrastFilter contrastFilter;
+    ImageButton ceSendBtn;
     Timer timer;
+    String caption;
 
     public void addCallback(Callback callback) {
         this.callback = callback;
@@ -69,6 +75,7 @@ public class CameraEditFragment extends Fragment {
 
     public interface Callback {
         void cameraEditOnClose();
+        void cameraEditOnPost(PostModel postModel);
     }
 
     @Override
@@ -98,6 +105,7 @@ public class CameraEditFragment extends Fragment {
                     }
                 }, 120);
             }
+
             @Override
             public void onLongPress() {
                 timer.cancel();
@@ -120,11 +128,41 @@ public class CameraEditFragment extends Fragment {
         progressTxtView = getProgressTxtView();
         mGPUImage = new GPUImage(getActivity());
         contrastFilter = new GPUImageContrastFilter();
+        ceSendBtn = getCeSendBtn();
         // mGPUImage.setGLSurfaceView((GLSurfaceView) view.findViewById(R.id.surface_view));
         attachImage();
-
-
         return view;
+    }
+
+    private ImageButton getCeSendBtn() {
+        if (ceSendBtn == null) {
+            ImageButton ceSendBtn = (ImageButton) view.findViewById(R.id.ceSendBtn);
+            ceSendBtn.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    postMoment();
+                }
+            });
+            this.ceSendBtn = ceSendBtn;
+        }
+        return this.ceSendBtn;
+    }
+
+    private void postMoment()
+    {
+        cancelClick();
+        Bitmap bitmap = ((BitmapDrawable)imageView.getDrawable()).getBitmap();
+        final PostModel postModel = new PostModel();
+        postModel.setMedia_type(0);
+        postModel.setExpireIndex(expireIndex);
+        postModel.setImage(bitmap);
+        postModel.setCaption(caption);
+        postModel.generateFile(getActivity(), new SimpleCallback2() {
+            @Override
+            public void callbackCall() {
+                callback.cameraEditOnPost(postModel);
+            }
+        });
     }
 
     private LinearLayout getProgressLayout() {
@@ -159,7 +197,6 @@ public class CameraEditFragment extends Fragment {
 
         imageView.setImageBitmap(photoTaken);
     }
-
 
 
     // Views
@@ -356,9 +393,12 @@ public class CameraEditFragment extends Fragment {
             final EditText editText = (EditText) view.findViewById(R.id.edit_text);
             editText.addTextChangedListener(new TextWatcher() {
                 @Override
-                public void beforeTextChanged(CharSequence charSequence, int i, int i2, int i3) { }
+                public void beforeTextChanged(CharSequence charSequence, int i, int i2, int i3) {
+                }
+
                 @Override
-                public void onTextChanged(CharSequence charSequence, int i, int i2, int i3) { }
+                public void onTextChanged(CharSequence charSequence, int i, int i2, int i3) {
+                }
 
                 @Override
                 public void afterTextChanged(Editable editable) {
@@ -379,7 +419,10 @@ public class CameraEditFragment extends Fragment {
 
     public void dismissCaptionEdit() {
 
-        String captionTxt = editText.getText().length() == 0 ? getString(R.string.add_caption_txt) : editText.getText().toString();
+        if (editText.getText().length() > 0){
+            caption = editText.getText().toString();
+        }
+        String captionTxt = editText.getText().length() == 0 ? getString(R.string.add_caption_txt) : caption;
         captionBtn.setText(captionTxt);
         animateCaptionOut();
         InputMethodManager inputManager =

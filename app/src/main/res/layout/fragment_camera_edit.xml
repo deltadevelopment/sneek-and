@@ -77,7 +77,7 @@
             android:textColor="@color/cameraGrey" />
 
         <ImageButton
-            android:id="@+id/send_button"
+            android:id="@+id/ceSendBtn"
             android:layout_width="47dp"
             android:layout_height="47dp"
             android:layout_alignParentBottom="true"

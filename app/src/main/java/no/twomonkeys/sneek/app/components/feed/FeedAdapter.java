@@ -1,8 +1,11 @@
 package no.twomonkeys.sneek.app.components.feed;
 
 import android.content.Context;
+import android.support.v7.widget.PopupMenu;
 import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
+import android.view.Menu;
+import android.view.MenuInflater;
 import android.view.View;
 import android.view.ViewGroup;
 
@@ -31,6 +34,13 @@ public class FeedAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> i
         notifyDataSetChanged();
     }
 
+    public void replacePost(PostModel postModel)
+    {
+        posts.remove(0);
+        posts.add(0,postModel);
+        notifyDataSetChanged();
+    }
+
     public PostModel getLastPost()
     {
         return this.posts.get(0);
@@ -38,6 +48,7 @@ public class FeedAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> i
 
     public interface Callback {
         public void feedAdapterTap(PostModel postModel);
+        public void feedAdapterLongPress();
     }
 
     Callback callback;
@@ -98,6 +109,11 @@ public class FeedAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> i
     @Override
     public void imageViewHolderTap(PostModel postModel) {
         callback.feedAdapterTap(postModel);
+    }
+
+    @Override
+    public void imageViewHolderLongPress() {
+        callback.feedAdapterLongPress();
     }
 
     public void addCallback(Callback callback) {

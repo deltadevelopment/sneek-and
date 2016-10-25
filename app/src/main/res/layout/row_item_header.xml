@@ -32,6 +32,12 @@
                 android:textAllCaps="true"
                 android:textColor="@color/white"
                 android:textSize="18sp" />
+            <com.facebook.drawee.view.SimpleDraweeView xmlns:fresco="http://schemas.android.com/apk/res-auto"
+                android:id="@+id/fUserPhotoSdv"
+                android:layout_width="70dp"
+                android:layout_height="70dp"
+                fresco:roundedCornerRadius="35dp"
+                android:background="@color/white"/>
         </RelativeLayout>
 
         <RelativeLayout
@@ -45,7 +51,7 @@
                 android:gravity="center_vertical"
                 android:paddingLeft="20dp"
                 android:paddingRight="20dp"
-                android:text="jack"
+                android:text="username"
                 android:textColor="@color/blackColor"
                 android:textSize="18sp" />
             <ImageButton

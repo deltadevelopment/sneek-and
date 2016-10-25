@@ -27,6 +27,12 @@
             android:gravity="center"
             android:textColor="@color/white"
             android:textAllCaps="true" />
+        <com.facebook.drawee.view.SimpleDraweeView xmlns:fresco="http://schemas.android.com/apk/res-auto"
+            android:id="@+id/fUserPhotoSdv"
+            android:layout_width="70dp"
+            android:layout_height="70dp"
+            fresco:roundedCornerRadius="35dp"
+            android:background="@color/white"/>
 
     </RelativeLayout>
 

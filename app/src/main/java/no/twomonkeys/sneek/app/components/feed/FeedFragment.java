@@ -5,8 +5,12 @@ import android.graphics.Typeface;
 import android.support.v4.app.Fragment;
 import android.os.Bundle;
 import android.support.v7.widget.LinearLayoutManager;
+import android.support.v7.widget.PopupMenu;
 import android.support.v7.widget.RecyclerView;
+import android.view.ContextMenu;
 import android.view.LayoutInflater;
+import android.view.Menu;
+import android.view.MenuInflater;
 import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewGroup;
@@ -46,7 +50,7 @@ public class FeedFragment extends Fragment implements EditView.Callback, Keyboar
     RelativeLayout feedLl;
     EditView editView;
     int editViewOriginalHeight;
-    boolean keyboardIsActive;
+    boolean keyboardIsActive, keyboardDidHide;
     SimpleImageViewer postSiv;
     TextView toolbarTitle;
 
@@ -55,6 +59,8 @@ public class FeedFragment extends Fragment implements EditView.Callback, Keyboar
         public void feedFragmentOnFullScreenStart();
 
         public void feedFragmentOnFullScreenEnd();
+
+        public void feedFragmentOnCameraClicked();
     }
 
     Callback callback;
@@ -119,6 +125,7 @@ public class FeedFragment extends Fragment implements EditView.Callback, Keyboar
         }
         return this.mLayoutManager;
     }
+
 
     private RecyclerView getfRecyclerView() {
         if (this.fRecyclerView == null) {
@@ -233,11 +240,16 @@ public class FeedFragment extends Fragment implements EditView.Callback, Keyboar
         postModel.save(new NetworkCallback() {
             @Override
             public void exec(ErrorModel errorModel) {
-                if (errorModel == null){
+                if (errorModel == null) {
                     System.out.println("POSTED MSG SUCCESS");
                 }
             }
         });
+    }
+
+    @Override
+    public void editViewDidClickCamera() {
+        callback.feedFragmentOnCameraClicked();
     }
 
     //KeyboardUtil delegate methods
@@ -245,6 +257,7 @@ public class FeedFragment extends Fragment implements EditView.Callback, Keyboar
     public void keyboardUtilOnSizeChange(int height) {
         if (height != 0) {
             if (feedLl.getPaddingBottom() != height) {
+                keyboardDidHide = false;
                 editView.editModeStarted();
                 keyboardIsActive = true;
                 showKeyboard();
@@ -254,8 +267,12 @@ public class FeedFragment extends Fragment implements EditView.Callback, Keyboar
             }
         } else {
             if (editView.getHeight() != UIHelper.dpToPx(getActivity(), 50)) {
-                hideKeyboard();
-                editView.editModeEnded();
+                if (!keyboardDidHide) {
+                    keyboardDidHide = true;
+                    hideKeyboard();
+                    editView.editModeEnded();
+                }
+
             }
             if (feedLl.getPaddingBottom() != 0) {
                 //reset the padding of the contentView
@@ -274,7 +291,7 @@ public class FeedFragment extends Fragment implements EditView.Callback, Keyboar
     }
 
     private void hideKeyboard() {
-        System.out.println("CLICKED");
+        System.out.println("Hiding keyboard");
         editView.editModeEnded();
         InputMethodManager imm = (InputMethodManager) getActivity().getSystemService(Context.INPUT_METHOD_SERVICE);
         imm.hideSoftInputFromWindow(editView.getEditEt().getWindowToken(), 0);
@@ -285,17 +302,40 @@ public class FeedFragment extends Fragment implements EditView.Callback, Keyboar
         editView.setLayoutParams(layoutParams);
     }
 
+    public void addNewImagePost(final PostModel postModel) {
+        final PostModel newPostModel = PostModel.newImageInstance(fAdapter.getLastPost());
+        newPostModel.setImage_width(postModel.getImage().getWidth());
+        newPostModel.setImage_height(postModel.getImage().getHeight());
+        newPostModel.setMediaFile(postModel.getMediaFile());
+        newPostModel.setCaption(postModel.getCaption());
+        newPostModel.setExpireIndex(postModel.getExpireIndex());
+        fAdapter.addPost(newPostModel);
+        newPostModel.save(new NetworkCallback() {
+            @Override
+            public void exec(ErrorModel errorModel) {
+                System.out.println("SUCCESS UPLOAD WHOLE");
+                newPostModel.setImage(postModel.getImage());
+                fAdapter.replacePost(newPostModel);
+            }
+        });
+    }
+
     @Override
     public void feedAdapterTap(PostModel postModel) {
         getActivity().getWindow().setFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN, WindowManager.LayoutParams.FLAG_FULLSCREEN);
 
         MainActivity mact = (MainActivity) getActivity();
         mact.setSwipeable(false);
-       // mact.getToolbar().setVisibility(View.GONE);
+        // mact.getToolbar().setVisibility(View.GONE);
 
         postSiv.setVisibility(View.VISIBLE);
         postSiv.updatePost(postModel);
         postSiv.setVisibility(View.VISIBLE);
+
+    }
+
+    @Override
+    public void feedAdapterLongPress() {
 
     }
 
@@ -308,7 +348,7 @@ public class FeedFragment extends Fragment implements EditView.Callback, Keyboar
     public void simpleImageViewerClose() {
         MainActivity mact = (MainActivity) getActivity();
         mact.setSwipeable(true);
-      //  mact.getToolbar().setVisibility(View.VISIBLE);
+        //  mact.getToolbar().setVisibility(View.VISIBLE);
         getActivity().getWindow().clearFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN);
     }
 

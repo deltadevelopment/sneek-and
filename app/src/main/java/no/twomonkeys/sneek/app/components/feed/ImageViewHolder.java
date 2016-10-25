@@ -3,6 +3,7 @@ package no.twomonkeys.sneek.app.components.feed;
 import android.app.Activity;
 import android.content.Context;
 import android.graphics.Bitmap;
+import android.graphics.BitmapShader;
 import android.graphics.Canvas;
 import android.graphics.Color;
 import android.graphics.Paint;
@@ -10,26 +11,37 @@ import android.graphics.Path;
 import android.graphics.PorterDuff;
 import android.graphics.PorterDuffXfermode;
 import android.graphics.RectF;
+import android.graphics.Shader;
 import android.graphics.drawable.BitmapDrawable;
 import android.graphics.drawable.Drawable;
 import android.graphics.drawable.GradientDrawable;
 import android.media.MediaPlayer;
 import android.net.Uri;
 import android.support.v4.content.ContextCompat;
+import android.support.v4.graphics.drawable.RoundedBitmapDrawable;
+import android.support.v4.graphics.drawable.RoundedBitmapDrawableFactory;
+import android.support.v7.widget.PopupMenu;
 import android.support.v7.widget.RecyclerView;
 import android.telecom.Call;
 import android.util.Log;
+import android.view.Menu;
+import android.view.MenuInflater;
 import android.view.MotionEvent;
 import android.view.View;
 import android.widget.FrameLayout;
+import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.MediaController;
 import android.widget.ProgressBar;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
 
+import com.facebook.drawee.backends.pipeline.Fresco;
 import com.facebook.drawee.generic.RoundingParams;
+import com.facebook.drawee.interfaces.DraweeController;
 import com.facebook.drawee.view.SimpleDraweeView;
+import com.facebook.imagepipeline.request.ImageRequest;
+import com.facebook.imagepipeline.request.ImageRequestBuilder;
 
 import java.io.File;
 import java.util.Date;
@@ -71,11 +83,14 @@ public class ImageViewHolder extends RecyclerView.ViewHolder {
     TextView iDateTxt;
     LinearLayout userLayout;
     RelativeLayout playLoaderRl;
+    int indexId;
 
     public interface Callback {
         public void imageViewHolderVideoStarted(ImageViewHolder imageViewHolder);
 
         public void imageViewHolderTap(PostModel postModel);
+
+        public void imageViewHolderLongPress();
     }
 
     Callback callback;
@@ -99,7 +114,7 @@ public class ImageViewHolder extends RecyclerView.ViewHolder {
 
     private SimpleDraweeView getDraweeView() {
         if (this.draweeView == null) {
-            SimpleDraweeView draweeView = (SimpleDraweeView) itemView.findViewById(R.id.draweeView);
+            final SimpleDraweeView draweeView = (SimpleDraweeView) itemView.findViewById(R.id.draweeView);
             draweeView.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {
@@ -116,6 +131,15 @@ public class ImageViewHolder extends RecyclerView.ViewHolder {
                 public boolean onLongClick(View v) {
                     longPressing = true;
                     System.out.println("LONG PRESSING");
+                  //  callback.imageViewHolderLongPress();
+                    PopupMenu popupMenu = new PopupMenu(context, draweeView);
+                    //MenuInflater menuInflater = popupMenu.getMenuInflater();
+                    //menuInflater.inflate(R.menu.my_contextual_menu, popupMenu.getMenu());
+                    popupMenu.getMenu().add(0, 0, Menu.NONE, "Show profile");
+                    popupMenu.getMenu().add(0, 0, Menu.NONE, "Unkeep");
+                    popupMenu.getMenu().add(0, 0, Menu.NONE, "Delete");
+
+                    popupMenu.show();
                     return false;
                 }
             });
@@ -231,6 +255,7 @@ public class ImageViewHolder extends RecyclerView.ViewHolder {
     public void updateHolder(Context context, final PostModel postModel) {
         this.context = context;
         this.postModel = postModel;
+        indexId = postModel.getId();
         boolean rightAlignment = postModel.getUserModel().getId() == DataHelper.getUserId();
         RelativeLayout.LayoutParams lp = (RelativeLayout.LayoutParams) userLayout.getLayoutParams();
         Size size = UIHelper.getOptimalSize(context, postModel.getImage_width(), postModel.getImage_height());
@@ -241,8 +266,7 @@ public class ImageViewHolder extends RecyclerView.ViewHolder {
         if (rightAlignment) {
             params.addRule(RelativeLayout.ALIGN_PARENT_RIGHT);
             lp.addRule(RelativeLayout.ALIGN_PARENT_RIGHT);
-        }
-        else{
+        } else {
             params.addRule(RelativeLayout.ALIGN_PARENT_LEFT);
             lp.addRule(RelativeLayout.ALIGN_PARENT_LEFT);
         }
@@ -257,19 +281,45 @@ public class ImageViewHolder extends RecyclerView.ViewHolder {
         createdAtTv.setText(DateHelper.shortTime(postModel.getCreated_at()));
         playLoaderV.setVisibility(View.INVISIBLE);
 
-        postModel.loadPhoto(draweeView, new SimpleCallback2() {
-            @Override
-            public void callbackCall() {
-                loadingRl.setVisibility(View.GONE);
-                if (postModel.getMedia_type() == 1) {
-                    // playLoaderV.startAnimating();
-                    playLoaderV.setVisibility(View.VISIBLE);
-                } else {
-                    playLoaderV.setVisibility(View.INVISIBLE);
-                }
-            }
-        });
+        draweeView.setVisibility(View.INVISIBLE);
+        System.out.println("POSTMODEL: " + DateHelper.shortTime(postModel.getCreated_at()) + " : "
+                + postModel.getId() + " : " + postModel.getMedia_url() + " : " + postModel.getMedia_key());
 
+        if (postModel.getMedia_url() != null) {
+            System.out.println("MEDIA URL IS " + postModel.getMedia_url());
+            draweeView.setVisibility(View.VISIBLE);
+            final ImageViewHolder self = this;
+            postModel.loadPhoto(draweeView, new SimpleCallback2() {
+                @Override
+                public void callbackCall() {
+                    System.out.println("IDS " + postModel.getId() + " : " + indexId);
+                    if (postModel.getId() == indexId) {
+                        self.loadingRl.setVisibility(View.INVISIBLE);
+                    } else {
+                        self.loadingRl.setVisibility(View.VISIBLE);
+                    }
+                    if (postModel.getMedia_type() == 1) {
+                        // playLoaderV.startAnimating();
+                        playLoaderV.setVisibility(View.VISIBLE);
+                    } else {
+                        playLoaderV.setVisibility(View.INVISIBLE);
+                    }
+                }
+            });
+        } else {
+            /*
+            if (postModel.getImage() != null) {
+                if (postModel.getId() == indexId) {
+                    loadingRl.setVisibility(View.INVISIBLE);
+                }
+                loadingRl.setVisibility(View.INVISIBLE);
+            } else {
+                System.out.println("GOT HERE NOWWW");
+
+            }
+*/
+            loadingRl.setVisibility(View.VISIBLE);
+        }
 
         PostArtifacts artifacts = postModel.getPostArtifacts();
 
@@ -327,6 +377,7 @@ public class ImageViewHolder extends RecyclerView.ViewHolder {
         // postVideoView.setBackground(shape);
         test(rectCorners, size);
     }
+
 
     void test(float[] rectCorners, Size size) {
         GradientDrawable shape = new GradientDrawable();

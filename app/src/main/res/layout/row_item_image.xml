@@ -58,7 +58,6 @@
             android:layout_width="170dp"
             android:layout_height="200dp"
             android:background="@color/cameraGrey">
-
             <ProgressBar
                 android:id="@+id/progressBar"
                 android:layout_width="30dp"

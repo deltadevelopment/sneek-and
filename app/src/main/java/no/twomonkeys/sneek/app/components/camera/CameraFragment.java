@@ -22,6 +22,7 @@ import java.util.List;
 
 import no.twomonkeys.sneek.R;
 import no.twomonkeys.sneek.app.shared.helpers.UIHelper;
+import no.twomonkeys.sneek.app.shared.models.PostModel;
 
 /**
  * Created by simenlie on 04.10.2016.
@@ -37,7 +38,19 @@ public class CameraFragment extends Fragment implements CameraEditFragment.Callb
     private View view;
     private int cameraId;
     private boolean isSwitchingCamera, flashOn;
+    private ImageButton cBackBtn;
 
+    public interface Callback {
+        void cameraFragmentTappedClose();
+
+        void cameraFragmentDidPost(PostModel postModel);
+    }
+
+    Callback callback;
+
+    public void addCallback(Callback callback) {
+        this.callback = callback;
+    }
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
@@ -83,9 +96,25 @@ public class CameraFragment extends Fragment implements CameraEditFragment.Callb
         cameraBtn = getCameraBtn();
         selfieBtn = getSelfieBtn();
         flashBtn = getFlashBtn();
+        cBackBtn = getcBackBtn();
         return view;
     }
 
+    private ImageButton getcBackBtn() {
+        if (this.cBackBtn == null) {
+            ImageButton cBackBtn = (ImageButton) view.findViewById(R.id.cBackBtn);
+            cBackBtn.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    callback.cameraFragmentTappedClose();
+                }
+            });
+
+            this.cBackBtn = cBackBtn;
+        }
+
+        return this.cBackBtn;
+    }
 
     public void tapToFocus(MotionEvent event) {
         if (mCamera != null) {
@@ -97,21 +126,21 @@ public class CameraFragment extends Fragment implements CameraEditFragment.Callb
             float y = event.getY();
 
             Rect touchRect = new Rect(
-                    (int)(x - 100),
-                    (int)(y - 100),
-                    (int)(x + 100),
-                    (int)(y + 100));
+                    (int) (x - 100),
+                    (int) (y - 100),
+                    (int) (x + 100),
+                    (int) (y + 100));
 
             final Rect targetFocusRect = new Rect(
-                    touchRect.left * 2000/view.getWidth() - 1000,
-                    touchRect.top * 2000/view.getHeight() - 1000,
-                    touchRect.right * 2000/view.getWidth() - 1000,
-                    touchRect.bottom * 2000/view.getHeight() - 1000);
+                    touchRect.left * 2000 / view.getWidth() - 1000,
+                    touchRect.top * 2000 / view.getHeight() - 1000,
+                    touchRect.right * 2000 / view.getWidth() - 1000,
+                    touchRect.bottom * 2000 / view.getHeight() - 1000);
 
             Rect focusRect = new Rect(-1000, -1000, 1000, 0);
             focusRect = targetFocusRect;
-                    //left, top, right, bottm
-           // Rect focusRect = calculateTapArea(event.getX(), event.getY(), 1f);
+            //left, top, right, bottm
+            // Rect focusRect = calculateTapArea(event.getX(), event.getY(), 1f);
             Log.v("the result is", "result it" + event.getX() + " : " + event.getY());
             Camera.Parameters parameters = camera.getParameters();
             if (parameters.getFocusMode() != Camera.Parameters.FOCUS_MODE_AUTO) {
@@ -147,10 +176,16 @@ public class CameraFragment extends Fragment implements CameraEditFragment.Callb
         }
     }
 
+    @Override
+    public void onStart() {
+        super.onStart();
+        System.out.println("ON START");
+    }
 
     @Override
     public void onResume() {
         super.onResume();
+        System.out.println("ON RESUME");
         cameraId = 1;
         if (safeCameraOpen(cameraId)) {
             mPreview.setCamera(mCamera);
@@ -160,13 +195,22 @@ public class CameraFragment extends Fragment implements CameraEditFragment.Callb
     @Override
     public void onPause() {
         super.onPause();
-
+        System.out.println("RELEASING CAMERA");
         if (mCamera != null) {
             mCamera.stopPreview();
             mCamera.setPreviewCallback(null);
             mPreview.mHolder.removeCallback(mPreview);
             mCamera.release();
+            mCamera = null;
         }
+        //WAS here
+    }
+
+    @Override
+    public void onStop() {
+        System.out.println("RELEASING CAMERA STOP");
+        super.onStop();
+
     }
 
     //Opens the fragment_camera safely
@@ -221,6 +265,10 @@ public class CameraFragment extends Fragment implements CameraEditFragment.Callb
             this.bottomBv = bottomBv;
         }
         return this.bottomBv;
+    }
+
+    public void hide() {
+        view.setVisibility(View.INVISIBLE);
     }
 
     private ImageButton getCameraBtn() {
@@ -346,7 +394,7 @@ public class CameraFragment extends Fragment implements CameraEditFragment.Callb
 
     public void replaceFragment(Fragment someFragment) {
         FragmentTransaction transaction = getFragmentManager().beginTransaction();
-        transaction.replace(R.id.fragment_container, someFragment);
+        transaction.replace(R.id.fragment_container2, someFragment);
         transaction.addToBackStack(null);
         transaction.commit();
     }
@@ -355,8 +403,12 @@ public class CameraFragment extends Fragment implements CameraEditFragment.Callb
     //Camera layout_edit fragment callback
     @Override
     public void cameraEditOnClose() {
-        Log.v("CLOSED", "CLOSED EDIT");
         mCamera.startPreview();
+    }
+
+    @Override
+    public void cameraEditOnPost(PostModel postModel) {
+        callback.cameraFragmentDidPost(postModel);
     }
 
 }

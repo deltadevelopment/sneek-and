@@ -5,6 +5,18 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:orientation="vertical">
+    <RelativeLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:visibility="gone"
+        android:id="@+id/fragment_container">
+        <fragment
+            android:id="@+id/cameraFragment"
+            class="no.twomonkeys.sneek.app.components.camera.CameraFragment"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:background="@color/circleGreen" />
+    </RelativeLayout>
     <!--  <fragment
           android:id="@+id/cameraFragment"
           class="no.twomonkeys.sneek.app.components.fragment_camera.CameraFragment"
@@ -51,5 +63,8 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:overScrollMode="never"></no.twomonkeys.sneek.app.components.ViewPager>
+
+
+
 
 </LinearLayout>

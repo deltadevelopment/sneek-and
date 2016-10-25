@@ -19,6 +19,7 @@ import no.twomonkeys.sneek.app.shared.interfaces.ArrayCallback;
 import no.twomonkeys.sneek.app.shared.models.ErrorModel;
 import no.twomonkeys.sneek.app.shared.models.FollowingModel;
 import no.twomonkeys.sneek.app.shared.models.SuggestionModel;
+import no.twomonkeys.sneek.app.shared.models.UserModel;
 
 /**
  * Created by Christian Dalsvaag on 27/09/16
@@ -57,6 +58,11 @@ public class FriendsFragment extends Fragment implements FriendsAdapter.Callback
         Typeface type = Typeface.createFromAsset(getActivity().getAssets(), "arial-rounded-mt-bold.ttf");
         toolbar_title.setTypeface(type);
 
+
+        fAdapter = new FriendsAdapter();
+        fAdapter.addCallback(this);
+        fRecyclerView.setAdapter(fAdapter);
+
         fetchFollowing();
 
         return view;
@@ -64,38 +70,35 @@ public class FriendsFragment extends Fragment implements FriendsAdapter.Callback
 
     //Data methods
     public void fetchFollowing() {
-        // Fetch the data
+
         final FriendsFragment self = this;
         FollowingModel.fetchAll(new ArrayCallback() {
             @Override
             public void exec(ArrayList arrayList, ErrorModel errorModel) {
-                Log.v("Fetching", "fetch " + arrayList);
-                fAdapter = new FriendsAdapter(arrayList);
-                fAdapter.addCallback(self);
-                fRecyclerView.setAdapter(fAdapter);
+                fAdapter.setFollowings(arrayList);
+                fAdapter.notifyDataSetChanged();
             }
         });
+
     }
 
-    public void fetchSuggestions(boolean reloadData)
-    {
+    public void fetchSuggestions() {
         SuggestionModel.fetchAll(new ArrayCallback() {
             @Override
             public void exec(ArrayList arrayList, ErrorModel errorModel) {
-                System.out.println("Suggestions fetched");
-
+                fAdapter.setSuggestions(arrayList);
+                fAdapter.notifyDataSetChanged();
             }
         });
     }
 
     @Override
     public void adapterDidClickSuggestion() {
-        //fetch suggestion here
-        //fetchSuggestions();
+        fetchSuggestions();
     }
 
     @Override
     public void adapterDidClickFollowing() {
-        //fetchFollowing();
+        fetchSuggestions();
     }
 }

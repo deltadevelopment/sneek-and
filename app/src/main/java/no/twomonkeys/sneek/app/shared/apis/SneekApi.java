@@ -41,11 +41,7 @@ public interface SneekApi {
     @GET("v1/feed/suggestions")
     Call<ResponseModel> getSuggestion();
 
-    // Upload
-    @PUT
-    @Headers("Content-Type: multipart/form-data;boundary=95416089-b2fd-4eab-9a14-166bb9c5788b")
-    Call<ResponseBody> upload(@Url String url,
-                              @Body RequestBody body);
+
     //User
     @POST("v1/user")
     Call<ResponseModel> postUser(@Body HashMap<String, HashMap> body);
@@ -55,8 +51,24 @@ public interface SneekApi {
             @Path("username") String username
     );
 
+    @GET("v1/user/{user_id}")
+    Call<ResponseModel> getUser(
+            @Path("user_id") int user_id
+    );
+
     //Login
     @POST("v1/login")
     Call<ResponseModel> postLogin(@Body HashMap<String, HashMap> body);
+
+    //Upload
+    @POST("v1/post/generate_upload_url")
+    Call<ResponseModel> postGenerateToken(
+    );
+
+    // Upload
+    @PUT
+    @Headers("Content-Type: multipart/form-data;boundary=95416089-b2fd-4eab-9a14-166bb9c5788b")
+    Call<ResponseBody> upload(@Url String url,
+                              @Body RequestBody body);
 
 }

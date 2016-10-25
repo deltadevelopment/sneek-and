@@ -42,7 +42,7 @@ public class FollowingModel extends CRUDModel {
                         ArrayList<Map> followingsArray = (ArrayList<Map>) map.get("followings");
 
                         for(Map followingMap : followingsArray){
-                            followings.add(new FollowingModel(followingMap));
+                            followings.add(new UserModel((Map)followingMap.get("followee")));
                         }
                     }
                 },

@@ -1,10 +1,12 @@
 package no.twomonkeys.sneek.app.shared.helpers;
 
+import android.net.Uri;
 import android.util.Log;
 
 import com.google.gson.Gson;
 import com.google.gson.reflect.TypeToken;
 
+import java.io.File;
 import java.io.IOException;
 import java.util.HashMap;
 import java.util.Map;
@@ -14,6 +16,8 @@ import no.twomonkeys.sneek.app.shared.NetworkCallback;
 import no.twomonkeys.sneek.app.shared.apis.SneekApi;
 import no.twomonkeys.sneek.app.shared.models.ErrorModel;
 import no.twomonkeys.sneek.app.shared.models.ResponseModel;
+import okhttp3.MediaType;
+import okhttp3.RequestBody;
 import okhttp3.ResponseBody;
 import retrofit2.Call;
 import retrofit2.Callback;
@@ -30,12 +34,13 @@ public class NetworkHelper {
             @Override
             public void onResponse(Call<ResponseModel> call, Response<ResponseModel> response) {
                 ResponseModel responseModel = response.body();
-                if (responseModel != null){
+                if (responseModel != null) {
                     System.out.println("DATA: " + responseModel.data);
                     mcb.callbackCall(contract.generic_contract(responseModel.data));
                 }
                 handleError(response, scb);
             }
+
             @Override
             public void onFailure(Call<ResponseModel> call, Throwable t) {
 
@@ -45,13 +50,11 @@ public class NetworkHelper {
         });
     }
 
-    public static SneekApi getNetworkService()
-    {
+    public static SneekApi getNetworkService() {
         // TODO: When implementing login replace this
         // String authToken = DataHelper.getAuthToken();
         String authToken = "d389085148bfd1678041e634e12638ca";
-        if (authToken != auth_token)
-        {
+        if (authToken != auth_token) {
             auth_token = authToken;
             networkService = ServiceGenerator.createService(SneekApi.class, DataHelper.getAuthToken());
         }
@@ -65,8 +68,7 @@ public class NetworkHelper {
         ErrorModel errorModel;
 
         Log.d(TAG, "onResponse - Status : " + response.code());
-        if (response.code() == 401)
-        {
+        if (response.code() == 401) {
             //Log out
             // DataHelper.startActivity.logout();
         }
@@ -101,5 +103,36 @@ public class NetworkHelper {
             }
         }
     }
+
+
+    public static void uploadFile(File file, String url, final NetworkCallback scb, ProgressRequestBody.UploadCallbacks listener) {
+        SneekApi service =
+                ServiceGenerator.createService(SneekApi.class);
+
+        ProgressRequestBody prb = new ProgressRequestBody(file, listener);
+        RequestBody requestFile = ProgressRequestBody.create(MediaType.parse("image/jpg"), file);
+
+        String uri = Uri.parse(url)
+                .buildUpon()
+                .build().toString();
+
+        Call<ResponseBody> call = service.upload(uri, prb);
+
+        call.enqueue(new Callback<ResponseBody>() {
+            @Override
+            public void onResponse(Call<ResponseBody> call,
+                                   Response<ResponseBody> response) {
+                Log.v("Upload", "success");
+                scb.exec(null);
+            }
+
+            @Override
+            public void onFailure(Call<ResponseBody> call, Throwable t) {
+                Log.e("Upload error:", t.getMessage());
+            }
+        });
+    }
+
+
 }
 

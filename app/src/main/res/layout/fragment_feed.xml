@@ -19,6 +19,7 @@
             android:layout_width="wrap_content"
             android:layout_height="match_parent"
             android:gravity="center_vertical"
+            android:textColor="@color/themeColor"
             android:layout_gravity="left"
             android:padding="10dp"
             android:textSize="20sp"
@@ -62,7 +63,5 @@
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:visibility="invisible"></no.twomonkeys.sneek.app.components.feed.views.SimpleImageViewer>
-
-
 
 </RelativeLayout>

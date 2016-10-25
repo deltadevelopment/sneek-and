@@ -89,7 +89,7 @@
             android:textColor="@color/toolbarGrey" />
     </LinearLayout>
     <ImageButton
-        android:id="@id/send_button"
+        android:id="@+id/send_button"
         android:layout_width="40dp"
         android:scaleType="fitCenter"
         android:background="@null"

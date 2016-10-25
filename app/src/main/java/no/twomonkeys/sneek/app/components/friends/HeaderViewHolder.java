@@ -9,7 +9,16 @@ import android.view.View;
 import android.widget.Button;
 import android.widget.TextView;
 
+import com.facebook.drawee.view.SimpleDraweeView;
+
+import org.w3c.dom.Text;
+
 import no.twomonkeys.sneek.R;
+import no.twomonkeys.sneek.app.shared.NetworkCallback;
+import no.twomonkeys.sneek.app.shared.SimpleCallback2;
+import no.twomonkeys.sneek.app.shared.helpers.DataHelper;
+import no.twomonkeys.sneek.app.shared.models.ErrorModel;
+import no.twomonkeys.sneek.app.shared.models.UserModel;
 
 /**
  * Created by simenlie on 24.10.2016.
@@ -19,9 +28,12 @@ public class HeaderViewHolder extends RecyclerView.ViewHolder {
 
     Button hFollowingBtn, hSuggestionBtn;
     Context context;
-   public  interface Callback
-    {
+    TextView usernameTxt, usernameFirstLetters;
+    SimpleDraweeView fUserPhotoSdv;
+
+    public interface Callback {
         public void headerDidTapSuggestion();
+
         public void headerDidTapFollowing();
     }
 
@@ -33,6 +45,9 @@ public class HeaderViewHolder extends RecyclerView.ViewHolder {
 
     public HeaderViewHolder(View itemView) {
         super(itemView);
+        fUserPhotoSdv = (SimpleDraweeView) itemView.findViewById(R.id.fUserPhotoSdv);
+        usernameTxt = (TextView) itemView.findViewById(R.id.username);
+        usernameFirstLetters = (TextView) itemView.findViewById(R.id.usernameFirstLetters);
         hFollowingBtn = (Button) itemView.findViewById(R.id.hFollowingBtn);
         hSuggestionBtn = (Button) itemView.findViewById(R.id.hSuggestionBtn);
         hFollowingBtn.setOnClickListener(new View.OnClickListener() {
@@ -55,8 +70,27 @@ public class HeaderViewHolder extends RecyclerView.ViewHolder {
 
     public void update(Context context) {
         this.context = context;
+        fUserPhotoSdv.setVisibility(View.INVISIBLE);
+        usernameFirstLetters.setText(DataHelper.getUsername().substring(0, 2));
+        usernameTxt.setText(DataHelper.getUsername());
         Typeface type = Typeface.createFromAsset(this.context.getAssets(), "arial-rounded-mt-bold.ttf");
         hSuggestionBtn.setTypeface(type);
         hFollowingBtn.setTypeface(type);
+        final UserModel userModel = new UserModel();
+        userModel.setId(DataHelper.getUserId());
+        userModel.fetch(new NetworkCallback() {
+            @Override
+            public void exec(ErrorModel errorModel) {
+                if (userModel.getProfile_picture_key() != null){
+                    fUserPhotoSdv.setVisibility(View.VISIBLE);
+                    userModel.loadPhoto(fUserPhotoSdv, new SimpleCallback2() {
+                        @Override
+                        public void callbackCall() {
+
+                        }
+                    });
+                }
+            }
+        });
     }
 }
