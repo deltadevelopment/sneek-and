@@ -11,7 +11,7 @@
     <color name="transparent">#00000000</color>
     <color name="cameraGrey">#CCCCCC</color>
     <color name="captionGrey">#B2B2B2</color>
-    <color name="themeColor">#FC476F</color>
+    <color name="themeColor">#FF2F5D</color>
     <color name="blackColor">#000000</color>
     <color name="usernameGrey">#ADADAD</color>
     <color name="createdAtGrey">#ADADAD</color>
@@ -20,5 +20,6 @@
     <color name="toolbarGrey">#999999</color>
     <color name="whiteTrsp">#F2FFFFFF</color>
     <color name="dateTxt">#DDDDDD</color>
+    <color name="messageColor">#E6E6E6</color>
 
 </resources>

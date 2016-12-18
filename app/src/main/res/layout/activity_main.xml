@@ -1,22 +1,53 @@
 <?xml version="1.0" encoding="utf-8"?>
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:id="@+id/main"
+    android:fitsSystemWindows="false"
     android:layout_width="match_parent"
-    android:layout_height="match_parent"
-    android:orientation="vertical">
+    android:background="@color/blackColor"
+    android:layout_height="match_parent">
+
+    <no.twomonkeys.sneek.app.components.ViewPager
+        android:id="@+id/vpPager"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:overScrollMode="never"></no.twomonkeys.sneek.app.components.ViewPager>
+
     <RelativeLayout
+        android:id="@+id/stream_container"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:visibility="gone"
-        android:id="@+id/fragment_container">
-        <fragment
+        android:visibility="gone">
+    </RelativeLayout>
+
+    <RelativeLayout
+        android:id="@+id/fragment_container"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:visibility="gone">
+
+        <!--<fragment
             android:id="@+id/cameraFragment"
             class="no.twomonkeys.sneek.app.components.camera.CameraFragment"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
+            android:background="@color/circleGreen" />-->
+
+    </RelativeLayout>
+
+    <RelativeLayout
+        android:id="@+id/profileFragmentContainer"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:visibility="invisible">
+        <fragment
+            android:id="@+id/profileFragment"
+            class="no.twomonkeys.sneek.app.components.profile.ProfileFragment"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
             android:background="@color/circleGreen" />
     </RelativeLayout>
+
     <!--  <fragment
           android:id="@+id/cameraFragment"
           class="no.twomonkeys.sneek.app.components.fragment_camera.CameraFragment"
@@ -58,13 +89,7 @@
     </FrameLayout>
 
 -->
-    <no.twomonkeys.sneek.app.components.ViewPager
-        android:id="@+id/vpPager"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:overScrollMode="never"></no.twomonkeys.sneek.app.components.ViewPager>
 
 
 
-
-</LinearLayout>
+</RelativeLayout>

@@ -55,9 +55,10 @@ public class PostModel extends CRUDModel implements ProgressRequestBody.UploadCa
     private Bitmap image;
     private File mediaFile;
     public PostArtifacts postArtifacts;
-    float cellHeight;
-    Size size;
+    public float cellHeight;
+    public Size size;
     TokenModel tokenModel;
+    PinModel pinModel;
 
     public File getMediaFile() {
         return mediaFile;
@@ -94,11 +95,19 @@ public class PostModel extends CRUDModel implements ProgressRequestBody.UploadCa
         void fileRetrieved(File file);
     }
 
+    public PinModel getPinModel() {
+        if (pinModel == null){
+            pinModel = new PinModel(this.id);
+        }
+        return pinModel;
+    }
+
     public void setCaption(String caption) {
         this.caption = caption;
     }
 
     public PostModel(Map map) {
+        System.out.println("POst is " + map);
         build(map);
     }
 
@@ -216,9 +225,14 @@ public class PostModel extends CRUDModel implements ProgressRequestBody.UploadCa
     }
 
 
+
+
     @Override
     void build(Map map) {
         System.out.println("MAP IS : " + map);
+
+
+
         id = integerFromObject(map.get("id"));
         media_type = integerFromObject(map.get("media_type"));
         caption_position = integerFromObject(map.get("caption_position"));
@@ -245,7 +259,9 @@ public class PostModel extends CRUDModel implements ProgressRequestBody.UploadCa
             userModel = new UserModel((Map) map.get("user"));
         }
         //This should be fixed later
-        size = UIHelper.getOptimalSize(MainActivity.mActivity, image_width, image_height);
+        if (MainActivity.mActivity != null){
+            size = UIHelper.getOptimalSize(MainActivity.mActivity, image_width, image_height);
+        }
     }
 
 
@@ -461,6 +477,31 @@ public class PostModel extends CRUDModel implements ProgressRequestBody.UploadCa
         } catch (IOException e) {
             e.printStackTrace();
         }
+    }
+
+    public void delete(NetworkCallback ncb)
+    {
+        NetworkHelper.sendRequest(NetworkHelper.getNetworkService().deletePost(id + ""),
+                GenericContract.generic_parse(),
+                onDataReturned(),
+                ncb);
+    }
+
+    //Keep
+    public void saveKeep(NetworkCallback ncb)
+    {
+        NetworkHelper.sendRequest(NetworkHelper.getNetworkService().postPin(this.id + ""),
+                GenericContract.v1_post_pin(),
+                onDataReturned(),
+                ncb);
+    }
+
+    public void deleteKeep(NetworkCallback ncb)
+    {
+        NetworkHelper.sendRequest(NetworkHelper.getNetworkService().deletePin(this.id + ""),
+                GenericContract.v1_post_pin(),
+                onDataReturned(),
+                ncb);
     }
 
 

@@ -2,6 +2,7 @@ package no.twomonkeys.sneek.app.components.feed;
 
 import android.app.Activity;
 import android.content.Context;
+import android.content.DialogInterface;
 import android.graphics.Bitmap;
 import android.graphics.BitmapShader;
 import android.graphics.Canvas;
@@ -20,15 +21,20 @@ import android.net.Uri;
 import android.support.v4.content.ContextCompat;
 import android.support.v4.graphics.drawable.RoundedBitmapDrawable;
 import android.support.v4.graphics.drawable.RoundedBitmapDrawableFactory;
+import android.support.v7.app.AlertDialog;
 import android.support.v7.widget.PopupMenu;
 import android.support.v7.widget.RecyclerView;
 import android.telecom.Call;
+import android.text.SpannableString;
+import android.text.style.ForegroundColorSpan;
 import android.util.Log;
 import android.view.Menu;
 import android.view.MenuInflater;
+import android.view.MenuItem;
 import android.view.MotionEvent;
 import android.view.View;
 import android.widget.FrameLayout;
+import android.widget.ImageButton;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.MediaController;
@@ -45,9 +51,12 @@ import com.facebook.imagepipeline.request.ImageRequestBuilder;
 
 import java.io.File;
 import java.util.Date;
+import java.util.Random;
 
 import no.twomonkeys.sneek.R;
 import no.twomonkeys.sneek.app.components.MainActivity;
+import no.twomonkeys.sneek.app.components.friends.FriendsViewHolder;
+import no.twomonkeys.sneek.app.shared.NetworkCallback;
 import no.twomonkeys.sneek.app.shared.SimpleCallback2;
 import no.twomonkeys.sneek.app.shared.helpers.DataHelper;
 import no.twomonkeys.sneek.app.shared.helpers.DateHelper;
@@ -55,6 +64,7 @@ import no.twomonkeys.sneek.app.shared.helpers.PostArtifacts;
 import no.twomonkeys.sneek.app.shared.helpers.Size;
 import no.twomonkeys.sneek.app.shared.helpers.UIHelper;
 import no.twomonkeys.sneek.app.shared.helpers.VideoHelper;
+import no.twomonkeys.sneek.app.shared.models.ErrorModel;
 import no.twomonkeys.sneek.app.shared.models.PostModel;
 import no.twomonkeys.sneek.app.shared.views.PlayLoaderView;
 import no.twomonkeys.sneek.app.shared.views.SneekVideoView;
@@ -63,7 +73,7 @@ import no.twomonkeys.sneek.app.shared.views.SneekVideoView;
  * Created by simenlie on 13.10.2016.
  */
 
-public class ImageViewHolder extends RecyclerView.ViewHolder {
+public class ImageViewHolder extends FeedViewHolder {
     SimpleDraweeView draweeView;
     TextView createdAtTv, usernameTv;
     LinearLayout imageRowLl;
@@ -71,29 +81,30 @@ public class ImageViewHolder extends RecyclerView.ViewHolder {
     ProgressBar progressBar;
     PlayLoaderView playLoaderV;
     SneekVideoView postVideoView;
-    PostModel postModel;
     private MediaController mediaControls;
     private int mPlayerPosition;
     VideoHelper videoHelper;
     View videoViewRp;
     private MediaPlayer mediaPlayer;
-    Context context;
     boolean isVisible = true;
     boolean longPressing;
     TextView iDateTxt;
     LinearLayout userLayout;
     RelativeLayout playLoaderRl;
+    SimpleDraweeView iProfileImgBtn;
+    TextView iUsernameFirstLetters;
     int indexId;
+    RelativeLayout iProfileLayout;
+    RelativeLayout bottomLayout;
+    int lastRandom;
 
-    public interface Callback {
+    public interface Callback extends FeedViewHolder.Callback {
         public void imageViewHolderVideoStarted(ImageViewHolder imageViewHolder);
 
         public void imageViewHolderTap(PostModel postModel);
 
         public void imageViewHolderLongPress();
     }
-
-    Callback callback;
 
     ImageViewHolder(View view) {
         super(view);
@@ -110,6 +121,18 @@ public class ImageViewHolder extends RecyclerView.ViewHolder {
         iDateTxt = (TextView) itemView.findViewById(R.id.iDateTxt);
         userLayout = (LinearLayout) itemView.findViewById(R.id.userLayout);
         playLoaderRl = (RelativeLayout) itemView.findViewById(R.id.playLoaderRl);
+        iProfileImgBtn = (SimpleDraweeView) itemView.findViewById(R.id.iProfileImgBtn);
+        iUsernameFirstLetters = (TextView) itemView.findViewById(R.id.iUsernameFirstLetters);
+        iProfileLayout = (RelativeLayout) itemView.findViewById(R.id.iProfileLayout);
+        iProfileLayout.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                //Show profile
+                callback.feedViewHolderShowProfile(postModel.getUserModel());
+                System.out.println("SHOWING PROFILE NOW");
+            }
+        });
+
     }
 
     private SimpleDraweeView getDraweeView() {
@@ -131,15 +154,8 @@ public class ImageViewHolder extends RecyclerView.ViewHolder {
                 public boolean onLongClick(View v) {
                     longPressing = true;
                     System.out.println("LONG PRESSING");
-                  //  callback.imageViewHolderLongPress();
-                    PopupMenu popupMenu = new PopupMenu(context, draweeView);
-                    //MenuInflater menuInflater = popupMenu.getMenuInflater();
-                    //menuInflater.inflate(R.menu.my_contextual_menu, popupMenu.getMenu());
-                    popupMenu.getMenu().add(0, 0, Menu.NONE, "Show profile");
-                    popupMenu.getMenu().add(0, 0, Menu.NONE, "Unkeep");
-                    popupMenu.getMenu().add(0, 0, Menu.NONE, "Delete");
+                    showPopUpMenu(draweeView);
 
-                    popupMenu.show();
                     return false;
                 }
             });
@@ -151,10 +167,8 @@ public class ImageViewHolder extends RecyclerView.ViewHolder {
     private SneekVideoView getPostVideoView() {
         if (this.postVideoView == null) {
             SneekVideoView postVideoView = (SneekVideoView) itemView.findViewById(R.id.postVideoView);
-
             this.postVideoView = postVideoView;
         }
-
         return this.postVideoView;
     }
 
@@ -170,7 +184,6 @@ public class ImageViewHolder extends RecyclerView.ViewHolder {
 
             this.playLoaderV = playLoaderV;
         }
-
         return this.playLoaderV;
     }
 
@@ -244,32 +257,66 @@ public class ImageViewHolder extends RecyclerView.ViewHolder {
 
             }
         });
-
         // postVideoView.setVideoURI(Uri.fromFile(file));
         postVideoView.setVideoPath(file.getAbsolutePath());
         postVideoView.requestFocus();
         //postVideoView.start();
     }
 
+    public void loadProfilePicture() {
+        if (postModel.getUserModel().getProfile_picture_key() != null) {
+            postModel.getUserModel().loadPhoto(iProfileImgBtn, new SimpleCallback2() {
+                @Override
+                public void callbackCall() {
+                    iUsernameFirstLetters.setVisibility(View.INVISIBLE);
+                }
+            });
+        } else {
+            //Set random color
+            setRandomColor(iProfileImgBtn);
+        }
+    }
 
-    public void updateHolder(Context context, final PostModel postModel) {
+    private void setRandomColor(View view) {
+        int[] colors = {R.color.circleBlue, R.color.circleGreen, R.color.circleGrey, R.color.circleRed};
+
+        GradientDrawable background = (GradientDrawable) view.getBackground();
+        int randomInt = getRandomInt();
+        background.setColor(ContextCompat.getColor(context, colors[randomInt]));
+    }
+
+    private int getRandomInt() {
+        Random r = new Random();
+        int randomInt = r.nextInt(4);
+        if (randomInt == lastRandom) {
+            return getRandomInt();
+        } else {
+            lastRandom = randomInt;
+            return randomInt;
+        }
+    }
+
+    public void updateHolder(Context context, final PostModel postModel, boolean isFirst) {
         this.context = context;
         this.postModel = postModel;
+
+        PostArtifacts artifacts = postModel.getPostArtifacts();
         indexId = postModel.getId();
         boolean rightAlignment = postModel.getUserModel().getId() == DataHelper.getUserId();
+        rightAlignment = artifacts.rightAlignment;
         RelativeLayout.LayoutParams lp = (RelativeLayout.LayoutParams) userLayout.getLayoutParams();
         Size size = UIHelper.getOptimalSize(context, postModel.getImage_width(), postModel.getImage_height());
         RelativeLayout.LayoutParams params = new RelativeLayout.LayoutParams(200, RelativeLayout.LayoutParams.WRAP_CONTENT);
         params.width = (int) size.width;
         params.height = (int) size.height;
         params.setMargins(0, 0, 0, 0);
-        if (rightAlignment) {
-            params.addRule(RelativeLayout.ALIGN_PARENT_RIGHT);
-            lp.addRule(RelativeLayout.ALIGN_PARENT_RIGHT);
-        } else {
-            params.addRule(RelativeLayout.ALIGN_PARENT_LEFT);
-            lp.addRule(RelativeLayout.ALIGN_PARENT_LEFT);
-        }
+
+        lp.setMargins(lp.leftMargin, lp.topMargin, lp.rightMargin, isFirst ? 200 : lp.bottomMargin);
+        //left, top, right, bottom
+
+        iUsernameFirstLetters.setText(postModel.getUserModel().getUsername().substring(0, 2));
+        loadProfilePicture();
+
         draweeView.setLayoutParams(params);
         loadingRl.setLayoutParams(params);
         playLoaderRl.setLayoutParams(params);
@@ -321,7 +368,6 @@ public class ImageViewHolder extends RecyclerView.ViewHolder {
             loadingRl.setVisibility(View.VISIBLE);
         }
 
-        PostArtifacts artifacts = postModel.getPostArtifacts();
 
         if (artifacts.isSameDay) {
             iDateTxt.setVisibility(View.GONE);
@@ -345,11 +391,13 @@ public class ImageViewHolder extends RecyclerView.ViewHolder {
         if (artifacts.sameUserNext && !artifacts.isLastInDay) {
             usernameTv.setVisibility(View.GONE);
             createdAtTv.setVisibility(View.GONE);
+            iProfileLayout.setVisibility(View.INVISIBLE);
             bottomPadding = 0;
         } else {
             if (artifacts.isLastInDay) {
                 bottomPadding = 0;
             }
+            iProfileLayout.setVisibility(View.VISIBLE);
             usernameTv.setVisibility(View.VISIBLE);
             createdAtTv.setVisibility(View.VISIBLE);
         }

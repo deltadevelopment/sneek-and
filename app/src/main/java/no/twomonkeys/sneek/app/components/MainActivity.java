@@ -3,17 +3,22 @@ package no.twomonkeys.sneek.app.components;
 import android.app.Activity;
 import android.app.FragmentTransaction;
 import android.content.Context;
+import android.content.Intent;
 import android.content.pm.ActivityInfo;
 import android.graphics.Typeface;
+import android.graphics.drawable.GradientDrawable;
+import android.os.Build;
 import android.os.Environment;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentPagerAdapter;
 
+import android.support.v4.content.ContextCompat;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.support.v7.widget.Toolbar;
 import android.telecom.Call;
+import android.util.DisplayMetrics;
 import android.view.View;
 import android.view.WindowManager;
 import android.view.animation.AccelerateInterpolator;
@@ -29,43 +34,64 @@ import java.io.File;
 
 import no.twomonkeys.sneek.R;
 import no.twomonkeys.sneek.app.components.camera.CameraFragment;
+import no.twomonkeys.sneek.app.components.channel.ChannelActivity;
+import no.twomonkeys.sneek.app.components.channel.ChannelFragment;
 import no.twomonkeys.sneek.app.components.feed.FeedFragment;
 import no.twomonkeys.sneek.app.components.friends.FriendsFragment;
 import no.twomonkeys.sneek.app.components.main.MainPagerAdapter;
+import no.twomonkeys.sneek.app.components.profile.ProfileFragment;
 import no.twomonkeys.sneek.app.shared.helpers.CacheKeyFactory;
+import no.twomonkeys.sneek.app.shared.helpers.UIHelper;
 import no.twomonkeys.sneek.app.shared.models.PostModel;
+import no.twomonkeys.sneek.app.shared.models.UserModel;
 
-public class MainActivity extends AppCompatActivity implements CameraFragment.Callback, MainPagerAdapter.Callback {
+public class MainActivity extends AppCompatActivity implements CameraFragment.Callback, MainPagerAdapter.Callback, ProfileFragment.Callback {
     MainPagerAdapter adapterViewPager;
 
     public static Activity mActivity;
 
     private ViewPager vpPager;
     private CameraFragment cameraFragment;
+    private static int currentPage = 1;
+    private boolean shouldRefreshCamera;
+    private ProfileFragment profileFragment;
     private FeedFragment feedFragment;
     static String TAG = "MainActivity";
+
     //TextView toolbarTitle;
     //Toolbar toolbar;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+
         initConfiguration();
+
         removeTitleBar();
         setContentView(R.layout.activity_main);
         vpPager = (ViewPager) findViewById(R.id.vpPager);
         vpPager.setSwipeable(true);
         adapterViewPager = new MainPagerAdapter(getSupportFragmentManager(), this);
         adapterViewPager.addCallback(this);
-/*
-        toolbarTitle = (TextView) findViewById(R.id.toolbar_title);
-        Typeface type = Typeface.createFromAsset(getAssets(), "arial-rounded-mt-bold.ttf");
-        toolbarTitle.setTypeface(type);
-        toolbar = (Toolbar) findViewById(R.id.toolbar_top);
-*/
+
+
+        overridePendingTransition(0, 0);
         vpPager.addOnPageChangeListener(new ViewPager.OnPageChangeListener() {
             @Override
             public void onPageScrolled(int position, float positionOffset, int positionOffsetPixels) {
+                System.out.println("SCROLLED " + position + " : " + positionOffset + " : " + positionOffsetPixels + "");
+                if (position == 0) {
+                    if (positionOffset > 0.0) {
+                        //getWindow().setFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN, WindowManager.LayoutParams.FLAG_FULLSCREEN);
+                        getWindow().addFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN);
+                        getWindow().clearFlags(WindowManager.LayoutParams.FLAG_FORCE_NOT_FULLSCREEN);
+                    } else {
+                        getWindow().clearFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN);
+
+                    }
+
+                    System.out.println("Size of toolbar is " + getStatusBarHeight());
+                }
             }
 
             @Override
@@ -74,8 +100,11 @@ public class MainActivity extends AppCompatActivity implements CameraFragment.Ca
                     case 0:
                         setActionBarTitle("Friends");
                         System.out.println("PageSelect: " + position);
+                        // getWindow().clearFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN);
+
                         break;
                     case 1:
+                        // getWindow().setFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN, WindowManager.LayoutParams.FLAG_FULLSCREEN);
                         setActionBarTitle("sneek");
                         break;
                 }
@@ -83,6 +112,7 @@ public class MainActivity extends AppCompatActivity implements CameraFragment.Ca
 
             @Override
             public void onPageScrollStateChanged(int state) {
+                System.out.println("CHANGED");
             }
         });
 
@@ -92,18 +122,37 @@ public class MainActivity extends AppCompatActivity implements CameraFragment.Ca
 
         //Camera
         //getFragmentManager().beginTransaction().add(R.id.main, new CameraFragment()).commit();
-        cameraFragment = (CameraFragment) getFragmentManager().findFragmentById(R.id.cameraFragment);
-        cameraFragment.addCallback(this);
+        //  cameraFragment = (CameraFragment) getFragmentManager().findFragmentById(R.id.cameraFragment);
+        //cameraFragment.addCallback(this);
+
+        profileFragment = (ProfileFragment) getSupportFragmentManager().findFragmentById(R.id.profileFragment);
+        profileFragment.addCallback(this);
         //cameraFragment.hide();
+        getWindow().setFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN, WindowManager.LayoutParams.FLAG_FULLSCREEN);
+
+
+
+
+        //Prevent the screen from becoming darker
+        getWindow().addFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON);
 
 
     }
 
-    public void replaceFragment(android.app.Fragment someFragment) {
-        FragmentTransaction transaction = getFragmentManager().beginTransaction();
-        transaction.replace(R.id.fragment_container, someFragment);
-        transaction.addToBackStack(null);
-        transaction.commit();
+
+    public int getStatusBarHeight() {
+        int result = 0;
+        int resourceId = getResources().getIdentifier("status_bar_height", "dimen", "android");
+        if (resourceId > 0) {
+            result = getResources().getDimensionPixelSize(resourceId);
+        }
+        return result;
+    }
+
+    @Override
+    protected void onResume() {
+        System.out.println("RESUMING");
+        super.onResume();
     }
 
 
@@ -121,6 +170,24 @@ public class MainActivity extends AppCompatActivity implements CameraFragment.Ca
 
         //Remove notification bar
         // this.getWindow().setFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN, WindowManager.LayoutParams.FLAG_FULLSCREEN);
+    }
+
+    @Override
+    public void onBackPressed() {
+        System.out.println("BACK PRESSED");
+        if (cameraFragment != null) {
+            if (cameraFragment.isAdded()) {
+
+                cameraFragmentTappedClose();
+            } else {
+                super.onBackPressed();
+
+            }
+        } else {
+            super.onBackPressed();
+        }
+
+        //
     }
 
     public void initConfiguration() {
@@ -152,8 +219,22 @@ public class MainActivity extends AppCompatActivity implements CameraFragment.Ca
         //requestWindowFeature(Window.FEATURE_NO_TITLE);
         //  getWindow().setFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN, WindowManager.LayoutParams.FLAG_FULLSCREEN);
         //getWindow().setStatusBarColor(getResources().getColor(R.color.cyan));
-        // getWindow().setFlags(WindowManager.LayoutParams.FLAG_LAYOUT_NO_LIMITS, WindowManager.LayoutParams.FLAG_LAYOUT_NO_LIMITS);
+        //getWindow().setFlags(WindowManager.LayoutParams.FLAG_LAYOUT_IN_SCREEN, WindowManager.LayoutParams.FLAG_LAYOUT_NO_LIMITS);
+
+        //  getWindow().addFlags(WindowManager.LayoutParams.FLAG_LAYOUT_IN_SCREEN);
+        //  getWindow().addFlags(WindowManager.LayoutParams.FLAG_LAYOUT_NO_LIMITS);
+        //  getWindow().addFlags(WindowManager.LayoutParams.FLAG_TRANSLUCENT_NAVIGATION);
+        //  WindowManager.LayoutParams attributes = getWindow().getAttributes();
+        //  attributes.flags |= WindowManager.LayoutParams.FLAG_LAYOUT_IN_SCREEN | WindowManager.LayoutParams.FLAG_LAYOUT_NO_LIMITS;
+        // getWindow().setAttributes(attributes);
+
+        getWindow().getDecorView().setSystemUiVisibility(
+                View.SYSTEM_UI_FLAG_LAYOUT_STABLE
+                        | View.SYSTEM_UI_FLAG_LAYOUT_FULLSCREEN);
+
+
     }
+
 
     public ViewPager getVpPager() {
         return vpPager;
@@ -163,7 +244,7 @@ public class MainActivity extends AppCompatActivity implements CameraFragment.Ca
     protected void onStart() {
         super.onStart();
         // Set the viewPager to display item no 1
-        vpPager.setCurrentItem(1);
+        vpPager.setCurrentItem(currentPage);
     }
 
     //Feed fragment delegates
@@ -179,27 +260,107 @@ public class MainActivity extends AppCompatActivity implements CameraFragment.Ca
 
     @Override
     public void feedFragmentOnCameraClicked() {
-        //getFragmentManager().beginTransaction().add(R.id.main, new CameraFragment()).commit();
-        //cameraFragment = (CameraFragment) getFragmentManager().findFragmentById(R.id.cameraFragment);
-        getWindow().setFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN, WindowManager.LayoutParams.FLAG_FULLSCREEN);
         RelativeLayout rl = (RelativeLayout) findViewById(R.id.fragment_container);
         rl.setVisibility(View.VISIBLE);
-        //CameraFragment cf = new CameraFragment();
-
-        //    replaceFragment(cf);
+        if (cameraFragment == null) {
+            cameraFragment = new CameraFragment();
+        }
+        cameraFragment.addCallback(this);
+        replaceFragment(cameraFragment);
     }
+
+    public void replaceFragment(android.app.Fragment someFragment) {
+        FragmentTransaction transaction = getFragmentManager().beginTransaction();
+        transaction.replace(R.id.fragment_container, someFragment);
+        transaction.addToBackStack(null);
+        transaction.commit();
+    }
+
+
+    @Override
+    public void feedFragmentOnProfileClick(final UserModel userModel) {
+        final RelativeLayout rl = (RelativeLayout) findViewById(R.id.profileFragmentContainer);
+        rl.setBackground(ContextCompat.getDrawable(this, R.color.transparent));
+        rl.setTranslationY(UIHelper.screenHeight(this));
+        rl.setVisibility(View.VISIBLE);
+        rl.animate().translationY(0).setDuration(300).withEndAction(new Runnable() {
+            @Override
+            public void run() {
+                profileFragment.updateUser(userModel);
+                // rl.setVisibility(View.GONE);
+            }
+        });
+    }
+
+    @Override
+    public void mainPagerAdapterDidTapUser() {
+        currentPage = 0;
+        /*
+        Intent i = new Intent(getApplicationContext(), ChannelActivity.class);
+        i.addFlags(Intent.FLAG_ACTIVITY_NO_ANIMATION);
+        startActivityForResult(i, 0);
+        overridePendingTransition(0, 0);
+        cameraFragment = null;
+        // startActivity(i);*/
+        /*
+        RelativeLayout rl = (RelativeLayout) findViewById(R.id.stream_container);
+        rl.setVisibility(View.VISIBLE);
+
+        ChannelFragment channelFragment = new ChannelFragment();
+        replaceFragment2(channelFragment);
+        */
+
+
+    }
+
+    public void replaceFragment2(android.app.Fragment someFragment) {
+        FragmentTransaction transaction = getFragmentManager().beginTransaction();
+        transaction.replace(R.id.stream_container, someFragment);
+        transaction.addToBackStack(null);
+        transaction.commit();
+    }
+
 
     @Override
     public void cameraFragmentTappedClose() {
         RelativeLayout rl = (RelativeLayout) findViewById(R.id.fragment_container);
         rl.setVisibility(View.GONE);
-        getWindow().clearFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN);
+        //getWindow().clearFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN);
+
+
     }
 
     @Override
     public void cameraFragmentDidPost(PostModel postModel) {
         cameraFragmentTappedClose();
         adapterViewPager.getFeedFragment().addNewImagePost(postModel);
+    }
+
+    @Override
+    public void profileFragmentOnFullScreenStart() {
+
+    }
+
+    @Override
+    public void profileFragmentOnFullScreenEnd() {
+
+    }
+
+    @Override
+    public void profileFragmentOnCameraClicked() {
+
+    }
+
+    @Override
+    public void profileFragmentOnClose() {
+        final RelativeLayout rl = (RelativeLayout) findViewById(R.id.profileFragmentContainer);
+        rl.setTranslationY(0);
+        rl.animate().translationY(UIHelper.screenHeight(this)).setDuration(300).withEndAction(new Runnable() {
+            @Override
+            public void run() {
+                rl.setVisibility(View.INVISIBLE);
+            }
+        });
     }
 }
 

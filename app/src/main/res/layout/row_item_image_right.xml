@@ -22,30 +22,9 @@
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="match_parent"
+        android:gravity="right"
         android:orientation="horizontal">
-        <RelativeLayout
-            android:id="@+id/iProfileLayout"
-            android:layout_width="50dp"
-            android:layout_height="match_parent">
-            <com.facebook.drawee.view.SimpleDraweeView
-                xmlns:fresco="http://schemas.android.com/apk/res-auto"
-                android:id="@+id/iProfileImgBtn"
-                android:layout_width="40dp"
-                android:layout_height="40dp"
-                android:background="@drawable/circle"
-                fresco:roundedCornerRadius="20dp"
-                android:layout_alignParentBottom="true"/>
-            <TextView
-                android:id="@+id/iUsernameFirstLetters"
-                android:textSize="18sp"
-                android:layout_width="40dp"
-                android:layout_height="40dp"
-                android:gravity="center"
-                android:text="AI"
-                android:textColor="@color/white"
-                android:textAllCaps="true"
-                android:layout_alignParentBottom="true"/>
-        </RelativeLayout>
+
         <RelativeLayout
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
@@ -104,7 +83,31 @@
 
 
         </RelativeLayout>
-
+        <RelativeLayout
+            android:id="@+id/iProfileLayout"
+            android:layout_width="50dp"
+            android:layout_height="match_parent">
+            <com.facebook.drawee.view.SimpleDraweeView
+                xmlns:fresco="http://schemas.android.com/apk/res-auto"
+                android:id="@+id/iProfileImgBtn"
+                android:layout_width="40dp"
+                android:layout_height="40dp"
+                android:layout_alignParentRight="true"
+                android:background="@drawable/circle"
+                fresco:roundedCornerRadius="20dp"
+                android:layout_alignParentBottom="true"/>
+            <TextView
+                android:id="@+id/iUsernameFirstLetters"
+                android:textSize="18sp"
+                android:layout_width="40dp"
+                android:layout_height="40dp"
+                android:layout_alignParentRight="true"
+                android:gravity="center"
+                android:text="AI"
+                android:textColor="@color/white"
+                android:textAllCaps="true"
+                android:layout_alignParentBottom="true"/>
+        </RelativeLayout>
 
     </LinearLayout>
 
@@ -113,10 +116,10 @@
         android:layout_height="wrap_content">
         <LinearLayout
             android:id="@+id/userLayout"
+            android:layout_alignParentRight="true"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_marginLeft="60dp"
-            android:layout_marginRight="10dp"
+            android:layout_marginRight="60dp"
             android:layout_marginTop="5dp"
             android:orientation="horizontal">
             <TextView

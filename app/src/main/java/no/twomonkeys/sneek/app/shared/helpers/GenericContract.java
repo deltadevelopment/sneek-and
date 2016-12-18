@@ -74,6 +74,44 @@ public class GenericContract {
         };
     }
 
+    public static Contract v1_get_user_moments() {
+        return new Contract() {
+            @Override
+            public Map generic_contract(Map map) {
+                System.out.println("MAP IS " + map);
+
+                Map storyMap = (Map) map.get("story");
+
+                ArrayList newMap = (ArrayList) storyMap.get("posts");
+                Map userMap = (Map) storyMap.get("user");
+
+                Map hMap = new HashMap<String, String>();
+                hMap.put("posts", newMap);
+                hMap.put("is_following", userMap.get("is_following"));
+
+                return hMap;
+            }
+        };
+    }
+
+    /*NSDictionary *storyDic = [dictionary objectForKey:@"story"];
+        NSDictionary *userDic = [storyDic objectForKey:@"user"];
+        NSDictionary *postsDic = [storyDic objectForKey:@"posts"];
+
+
+        return @{@"posts" : postsDic, @"is_following" : [userDic objectForKey:@"is_following"]}; //contractFormat;*/
+
+    public static Contract v1_post_pin() {
+        return new Contract() {
+            @Override
+            public Map generic_contract(Map map) {
+                Map newMap = (Map) map.get("post");
+
+                return newMap;
+            }
+        };
+    }
+
     public static Contract v1_get_user_username_exists() {
         return new Contract() {
             @Override

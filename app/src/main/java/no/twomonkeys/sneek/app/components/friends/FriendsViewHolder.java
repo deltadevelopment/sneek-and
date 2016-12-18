@@ -32,6 +32,15 @@ public class FriendsViewHolder extends RecyclerView.ViewHolder {
     SimpleDraweeView fUserPhotoSdv;
     Context context;
     UserModel userModel;
+    Callback callback;
+
+    public interface Callback {
+        public void friendsViewHolderDidTap();
+    }
+
+    public void addCallback(Callback callback) {
+        this.callback = callback;
+    }
 
     FriendsViewHolder(View view) {
         super(view);
@@ -39,6 +48,14 @@ public class FriendsViewHolder extends RecyclerView.ViewHolder {
         imageCircleIv = (ImageView) view.findViewById(R.id.imageCircle);
         firstLettersTv = (TextView) view.findViewById(R.id.usernameFirstLetters);
         fUserPhotoSdv = (SimpleDraweeView) view.findViewById(R.id.fUserPhotoSdv);
+
+        view.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                System.out.println("CLICKING FRIEND");
+                callback.friendsViewHolderDidTap();
+            }
+        });
     }
 
     public void update(Context context, UserModel userModel) {
@@ -96,6 +113,4 @@ public class FriendsViewHolder extends RecyclerView.ViewHolder {
         Random r = new Random();
         background.setColor(ContextCompat.getColor(context, colors[r.nextInt(4)]));
     }
-
-
 }

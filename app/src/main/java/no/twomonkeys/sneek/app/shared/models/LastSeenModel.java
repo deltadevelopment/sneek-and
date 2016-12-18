@@ -6,7 +6,7 @@ package no.twomonkeys.sneek.app.shared.models;
 
 public class LastSeenModel {
 
-    int lastSeenType, lastSeenId;
+    public int lastSeenType, lastSeenId;
     public static LastSeenModel lastSeenModelFromDisk() {
         return null;
     }

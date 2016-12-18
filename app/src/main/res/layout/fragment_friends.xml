@@ -5,28 +5,29 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:background="@color/white"
+    android:fitsSystemWindows="false"
     tools:context="no.twomonkeys.sneek.app.components.MainActivity">
 
     <RelativeLayout
         android:layout_width="match_parent"
-        android:layout_height="56dp"
-        android:background="@color/editBgGrey">
+        android:layout_height="63dp"
+        android:background="@color/themeColor">
 
-        <TextView
-            android:id="@+id/toolbar_title"
-            android:layout_width="wrap_content"
-            android:layout_height="match_parent"
-            android:layout_gravity="left"
-            android:gravity="center_vertical"
-            android:padding="10dp"
-            android:text="Friends"
-            android:textSize="20sp" />
+        <ImageView
+            android:layout_width="match_parent"
+            android:layout_height="56dp"
+            android:layout_margin="18dp"
+            android:layout_alignParentBottom="true"
+            android:src="@drawable/sneek_logo"
+            android:scaleType="fitCenter"/>
     </RelativeLayout>
+
     <RelativeLayout
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:layout_marginTop="56dp"
+        android:layout_marginTop="63dp"
         android:background="@color/white">
+
         <android.support.v7.widget.RecyclerView
             android:id="@+id/following_recycler_view"
             android:layout_width="match_parent"
@@ -40,7 +41,7 @@
     <View
         android:layout_width="match_parent"
         android:layout_height="5dp"
-        android:layout_marginTop="56dp"
+        android:layout_marginTop="63dp"
         android:background="@drawable/toolbar_dropshadow" />
 
 

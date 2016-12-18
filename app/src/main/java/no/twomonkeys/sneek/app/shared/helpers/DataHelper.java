@@ -10,6 +10,8 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map;
 
+import no.twomonkeys.sneek.app.components.StartActivity;
+
 /**
  * 26/09/16 by chridal
  * Copyright 2MONKEYS AS
@@ -20,6 +22,15 @@ public class DataHelper {
     public static Map<String, String> imageCacheMapHelper;
     public static ArrayList<String> flashSuggestions;
     public static boolean forceUpdateStory;
+    public static StartActivity startActivity;
+
+    public static StartActivity getStartActivity() {
+        return startActivity;
+    }
+
+    public static void setStartActivity(StartActivity startActivity) {
+        DataHelper.startActivity = startActivity;
+    }
 
     public static int currentFeed() {
         SharedPreferences settings = context.getSharedPreferences(PREFS_NAME, 0);
@@ -71,6 +82,7 @@ public class DataHelper {
         // TODO: Rewrite this
         SharedPreferences settings = context.getSharedPreferences(PREFS_NAME, 0);
         String authToken = settings.getString("auth_token", null);
+        System.out.println("Settings: " + authToken);
         //return "d389085148bfd1678041e634e12638ca";
         return authToken;
     }

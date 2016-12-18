@@ -112,6 +112,47 @@ public class DateHelper {
         return sameDay;
     }
 
+    public static String shortTimeAfter(String dateString)
+    {
+        SimpleDateFormat formatter = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSS'Z'");
+        formatter.setTimeZone(TimeZone.getTimeZone("UTC"));
+        try {
+            Date date1 = formatter.parse(dateString);
+            String outputString;
+
+            long diff = date1.getTime() - new Date().getTime();
+            long seconds = diff / 1000;
+            long minutes = seconds / 60;
+            long hours = minutes / 60;
+            long days = hours / 24;
+
+            if (seconds < 0){
+                return "expired_txt";
+            }
+
+            if (seconds > 60) {
+                if (minutes > 60) {
+                    if (hours > 24) {
+                        outputString = days + " days";
+                    } else {
+                        outputString = hours + " hours";
+                    }
+                } else {
+                    outputString = minutes + " minutes";
+                }
+            } else {
+                outputString = seconds + " seconds";
+            }
+
+            return outputString;
+
+
+        } catch (ParseException e) {
+            e.printStackTrace();
+        }
+        return null;
+    }
+
 
     public static String shortTimeSince(String date) {
 

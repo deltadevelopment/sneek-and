@@ -10,32 +10,36 @@
     android:orientation="vertical"
     tools:context="no.twomonkeys.sneek.app.components.MainActivity">
 
-    <RelativeLayout
-        android:layout_width="match_parent"
-        android:layout_height="56dp"
-        android:background="@color/editBgGrey">
-        <TextView
-            android:id="@+id/toolbar_title"
-            android:layout_width="wrap_content"
-            android:layout_height="match_parent"
-            android:gravity="center_vertical"
-            android:textColor="@color/themeColor"
-            android:layout_gravity="left"
-            android:padding="10dp"
-            android:textSize="20sp"
-            android:text="sneek" />
-    </RelativeLayout>
+
+
+    <!--
+        <RelativeLayout
+            android:layout_width="match_parent"
+            android:layout_height="56dp"
+            android:background="@color/editBgGrey">
+            <TextView
+                android:id="@+id/toolbar_title"
+                android:layout_width="wrap_content"
+                android:layout_height="match_parent"
+                android:gravity="center_vertical"
+                android:textColor="@color/themeColor"
+                android:layout_gravity="left"
+                android:padding="10dp"
+                android:textSize="20sp"
+                android:text="sneek" />
+        </RelativeLayout>
+        -->
 
     <RelativeLayout
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:layout_marginTop="56dp">
+        android:layout_marginTop="0dp">
 
         <com.orangegangsters.github.swipyrefreshlayout.library.SwipyRefreshLayout
             android:id="@+id/swipyrefreshlayout"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_marginBottom="50dp"
+            android:layout_marginBottom="0dp"
             app:srl_direction="bottom">
 
             <android.support.v7.widget.RecyclerView
@@ -45,23 +49,73 @@
                 android:scrollbars="vertical" />
         </com.orangegangsters.github.swipyrefreshlayout.library.SwipyRefreshLayout>
 
-        <no.twomonkeys.sneek.app.components.feed.views.EditView
-            android:id="@+id/editView"
+        <LinearLayout
             android:layout_width="match_parent"
-            android:layout_height="50dp"
-            android:layout_alignParentBottom="true"></no.twomonkeys.sneek.app.components.feed.views.EditView>
-    </RelativeLayout>
+            android:layout_height="40dp"
+            android:layout_alignParentBottom="true"
+            android:layout_marginBottom="10dp"
+            android:baselineAligned="true"
+            android:gravity="center"
+            android:orientation="horizontal">
 
-    <View
-        android:layout_width="match_parent"
-        android:layout_marginTop="56dp"
-        android:layout_height="5dp"
-        android:background="@drawable/toolbar_dropshadow" />
+            <ImageButton
+                android:id="@+id/composeBtn"
+                android:layout_width="40dp"
+                android:layout_height="40dp"
+                android:layout_marginLeft="10dp"
+                android:background="@drawable/round_corner"
+                android:padding="9dp"
+                android:scaleType="fitCenter"
+                android:src="@drawable/compose_icon" />
+
+            <Space
+                android:layout_width="0dp"
+                android:layout_height="1dp"
+                android:layout_weight="1"></Space>
+
+            <ImageButton
+                android:id="@+id/bredMouthBtn"
+                android:layout_width="40dp"
+                android:layout_height="40dp"
+                android:background="@color/transparent"
+                android:padding="3dp"
+                android:scaleType="fitCenter"
+                android:src="@drawable/mouth_icon" />
+
+            <Space
+                android:layout_width="0dp"
+                android:layout_height="1dp"
+                android:layout_weight="1"></Space>
+
+            <ImageButton
+                android:id="@+id/cameraBtn"
+                android:layout_width="40dp"
+                android:layout_height="40dp"
+                android:layout_marginRight="10dp"
+                android:background="@drawable/round_corner"
+                android:padding="8dp"
+                android:scaleType="fitCenter"
+                android:src="@drawable/camera_red" />
+        </LinearLayout>
+
+    </RelativeLayout>
+    <!--
+        <View
+            android:layout_width="match_parent"
+            android:layout_marginTop="56dp"
+            android:layout_height="5dp"
+            android:background="@drawable/toolbar_dropshadow" />
+    -->
+
+    <include layout="@layout/top_bar"/>
 
     <no.twomonkeys.sneek.app.components.feed.views.SimpleImageViewer
         android:id="@+id/postSiv"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:visibility="invisible"></no.twomonkeys.sneek.app.components.feed.views.SimpleImageViewer>
+
+
+
 
 </RelativeLayout>

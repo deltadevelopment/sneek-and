@@ -7,12 +7,13 @@ import android.support.v4.app.FragmentPagerAdapter;
 
 import no.twomonkeys.sneek.app.components.feed.FeedFragment;
 import no.twomonkeys.sneek.app.components.friends.FriendsFragment;
+import no.twomonkeys.sneek.app.shared.models.UserModel;
 
 /**
  * Created by simenlie on 25.10.2016.
  */
 
-public class MainPagerAdapter extends FragmentPagerAdapter implements FeedFragment.Callback {
+public class MainPagerAdapter extends FragmentPagerAdapter implements FeedFragment.Callback, FriendsFragment.Callback {
 
 
     private static int NUM_ITEMS = 2;
@@ -23,10 +24,21 @@ public class MainPagerAdapter extends FragmentPagerAdapter implements FeedFragme
         return feedFragment;
     }
 
+    @Override
+    public void friendsFragmentDidTapUser() {
+        callback.mainPagerAdapterDidTapUser();
+    }
+
     public interface Callback {
         void feedFragmentOnFullScreenStart();
+
         void feedFragmentOnFullScreenEnd();
+
         void feedFragmentOnCameraClicked();
+
+        void feedFragmentOnProfileClick(UserModel userModel);
+
+        void mainPagerAdapterDidTapUser();
     }
 
     Callback callback;
@@ -49,7 +61,9 @@ public class MainPagerAdapter extends FragmentPagerAdapter implements FeedFragme
     public Fragment getItem(int position) {
         switch (position) {
             case 0:
-                return FriendsFragment.newInstance();
+                FriendsFragment ff = FriendsFragment.newInstance();
+                ff.addCallback(this);
+                return ff;
             case 1:
                 feedFragment = FeedFragment.newInstance();
                 feedFragment.addCallback(this);
@@ -72,6 +86,11 @@ public class MainPagerAdapter extends FragmentPagerAdapter implements FeedFragme
     @Override
     public void feedFragmentOnCameraClicked() {
         callback.feedFragmentOnCameraClicked();
+    }
+
+    @Override
+    public void feedFragmentOnProfileTap(UserModel userModel) {
+        callback.feedFragmentOnProfileClick(userModel);
     }
 
 

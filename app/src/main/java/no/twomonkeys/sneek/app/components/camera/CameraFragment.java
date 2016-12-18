@@ -10,13 +10,16 @@ import android.support.v4.content.ContextCompat;
 import android.util.Log;
 import android.view.GestureDetector;
 import android.view.LayoutInflater;
+import android.view.MenuItem;
 import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewGroup;
+import android.view.ViewTreeObserver;
 import android.widget.FrameLayout;
 import android.widget.ImageButton;
 import android.widget.LinearLayout;
 
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -54,11 +57,28 @@ public class CameraFragment extends Fragment implements CameraEditFragment.Callb
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
+        System.out.println("CREATING VIEW");
         super.onCreate(savedInstanceState);
+
         mPreview = new CameraPreview(
                 this.getActivity().getBaseContext()
         );
+        mPreview.setVisibility(View.INVISIBLE);
+        mPreview.getViewTreeObserver().addOnGlobalLayoutListener(new ViewTreeObserver.OnGlobalLayoutListener() {
+            @Override
+            public void onGlobalLayout() {
+                System.out.println("LAYOUT COMPLETE");
+                //At this point the layout is complete and the
+                //dimensions of myView and any child views are known.
+                mPreview.setVisibility(View.VISIBLE);
+
+            }
+        });
+
+
     }
+
+
 
     @Nullable
     @Override
@@ -97,15 +117,19 @@ public class CameraFragment extends Fragment implements CameraEditFragment.Callb
         selfieBtn = getSelfieBtn();
         flashBtn = getFlashBtn();
         cBackBtn = getcBackBtn();
+
+        //initCamera();
         return view;
     }
 
     private ImageButton getcBackBtn() {
+        final CameraFragment f = this;
         if (this.cBackBtn == null) {
             ImageButton cBackBtn = (ImageButton) view.findViewById(R.id.cBackBtn);
             cBackBtn.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {
+                  //  getActivity().getFragmentManager().beginTransaction().remove(f).commit();
                     callback.cameraFragmentTappedClose();
                 }
             });
@@ -114,6 +138,12 @@ public class CameraFragment extends Fragment implements CameraEditFragment.Callb
         }
 
         return this.cBackBtn;
+    }
+
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        System.out.println("HEllo");
+        return super.onOptionsItemSelected(item);
     }
 
     public void tapToFocus(MotionEvent event) {
@@ -176,6 +206,7 @@ public class CameraFragment extends Fragment implements CameraEditFragment.Callb
         }
     }
 
+
     @Override
     public void onStart() {
         super.onStart();
@@ -185,11 +216,15 @@ public class CameraFragment extends Fragment implements CameraEditFragment.Callb
     @Override
     public void onResume() {
         super.onResume();
+
         System.out.println("ON RESUME");
         cameraId = 1;
+
         if (safeCameraOpen(cameraId)) {
             mPreview.setCamera(mCamera);
         }
+
+
     }
 
     @Override
@@ -210,13 +245,12 @@ public class CameraFragment extends Fragment implements CameraEditFragment.Callb
     public void onStop() {
         System.out.println("RELEASING CAMERA STOP");
         super.onStop();
-
     }
 
     //Opens the fragment_camera safely
     private boolean safeCameraOpen(int id) {
         boolean qOpened = false;
-
+        System.out.println("Opening camera again");
         try {
             releaseCameraAndPreview();
             mCamera = Camera.open(id);
@@ -227,6 +261,32 @@ public class CameraFragment extends Fragment implements CameraEditFragment.Callb
         }
 
         return qOpened;
+    }
+
+    private void initCamera() {
+        //create preview
+        //add it to preview
+        //open camera
+        mPreview = new CameraPreview(
+                this.getActivity().getBaseContext()
+        );
+        mPreview.setVisibility(View.INVISIBLE);
+        preview.addView(mPreview);
+        if (safeCameraOpen(cameraId)) {
+            mPreview.setCamera(mCamera);
+        }
+
+        mPreview.getViewTreeObserver().addOnGlobalLayoutListener(new ViewTreeObserver.OnGlobalLayoutListener() {
+            @Override
+            public void onGlobalLayout() {
+                System.out.println("LAYOUT COMPLETE");
+                //At this point the layout is complete and the
+                //dimensions of myView and any child views are known.
+                mPreview.setVisibility(View.VISIBLE);
+            }
+        });
+
+
     }
 
     //Releases the fragment_camera

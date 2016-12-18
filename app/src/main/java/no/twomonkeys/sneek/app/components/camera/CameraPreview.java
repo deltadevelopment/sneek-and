@@ -169,21 +169,23 @@ class CameraPreview extends ViewGroup implements SurfaceHolder.Callback {
 
         if (mCamera != null) {
             // Call stopPreview() to stop updating the preview surface.
-            mCamera.stopPreview();
+          // mCamera.stopPreview();
 
             // Important: Call release() to release the fragment_camera for use by other
             // applications. Applications should release the fragment_camera immediately
             // during onPause() and re-open() it during onResume()).
             mCamera.release();
 
-            mCamera = null;
+           // mCamera = null;
         }
     }
 
     @Override
     public void surfaceCreated(SurfaceHolder holder) {
+        System.out.println("Camera CREATED");
         try {
             if (mCamera != null) {
+                System.out.println("Camera is not nil here");
                 mCamera.setPreviewDisplay(holder);
                 mCamera.setPreviewCallback(new Camera.PreviewCallback() {
                     @Override

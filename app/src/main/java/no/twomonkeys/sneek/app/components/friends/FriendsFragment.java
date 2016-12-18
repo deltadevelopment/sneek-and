@@ -7,6 +7,7 @@ import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.util.Log;
 import android.view.LayoutInflater;
+import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.TextView;
@@ -31,7 +32,16 @@ public class FriendsFragment extends Fragment implements FriendsAdapter.Callback
     private RecyclerView fRecyclerView;
     private FriendsAdapter fAdapter;
     private RecyclerView.LayoutManager mLayoutManager;
-    private TextView toolbar_title;
+    //private TextView toolbar_title;
+    private Callback callback;
+
+    public interface Callback {
+        void friendsFragmentDidTapUser();
+    }
+
+    public void addCallback(Callback callback) {
+        this.callback = callback;
+    }
 
     public static FriendsFragment newInstance() {
         FriendsFragment friendsFragment = new FriendsFragment();
@@ -53,15 +63,33 @@ public class FriendsFragment extends Fragment implements FriendsAdapter.Callback
         fRecyclerView.setLayoutManager(new LinearLayoutManager(getActivity()));
 
         fRecyclerView.setHasFixedSize(true);
-        toolbar_title = (TextView) view.findViewById(R.id.toolbar_title);
+        //toolbar_title = (TextView) view.findViewById(R.id.toolbar_title);
 
-        Typeface type = Typeface.createFromAsset(getActivity().getAssets(), "arial-rounded-mt-bold.ttf");
-        toolbar_title.setTypeface(type);
+        //Typeface type = Typeface.createFromAsset(getActivity().getAssets(), "arial-rounded-mt-bold.ttf");
+        //toolbar_title.setTypeface(type);
 
 
         fAdapter = new FriendsAdapter();
         fAdapter.addCallback(this);
+        fAdapter.addCallback(this);
         fRecyclerView.setAdapter(fAdapter);
+
+        fRecyclerView.addOnItemTouchListener(new RecyclerView.OnItemTouchListener() {
+            @Override
+            public boolean onInterceptTouchEvent(RecyclerView rv, MotionEvent e) {
+                return false;
+            }
+
+            @Override
+            public void onTouchEvent(RecyclerView rv, MotionEvent e) {
+
+            }
+
+            @Override
+            public void onRequestDisallowInterceptTouchEvent(boolean disallowIntercept) {
+
+            }
+        });
 
         fetchFollowing();
 
@@ -100,5 +128,10 @@ public class FriendsFragment extends Fragment implements FriendsAdapter.Callback
     @Override
     public void adapterDidClickFollowing() {
         fetchSuggestions();
+    }
+
+    @Override
+    public void friendsAdapterDidClickCell() {
+        callback.friendsFragmentDidTapUser();
     }
 }

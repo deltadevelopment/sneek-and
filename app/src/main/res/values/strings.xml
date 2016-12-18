@@ -16,5 +16,17 @@
     <string name="validation_password_length">Must be between 6 and 20 characters</string>
     <string name="validation_loc_pass">Does not match</string>
     <string name="validation_loc_email">Not valid</string>
+    <string name="delete_moment_msg">Are you sure you want to delete the moment?</string>
+    <string name="delete_moment_title">Delete moment</string>
+
+    <string name="pin_title">Keeping a post</string>
+    <string name="pin_body">Keeping will keep the post in the stream until you unkeep or delete it</string>
+
+    <string name="pin_btn">Keep post</string>
+    <string name="pin_show_btn">Keep and don\'t show again</string>
+
+    <string name="pin_remove_title">Remove keep</string>
+    <string name="pin_remove_body">Unkeeping a post that has expired will delete it. Are you sure you want to unkeep this post?</string>
+    <string name="pin_remove_btn">Remove</string>
 
 </resources>

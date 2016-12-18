@@ -30,10 +30,10 @@ public class HeaderViewHolder extends RecyclerView.ViewHolder {
     Context context;
     TextView usernameTxt, usernameFirstLetters;
     SimpleDraweeView fUserPhotoSdv;
+    boolean isUpdated;
 
     public interface Callback {
         public void headerDidTapSuggestion();
-
         public void headerDidTapFollowing();
     }
 
@@ -69,28 +69,32 @@ public class HeaderViewHolder extends RecyclerView.ViewHolder {
     }
 
     public void update(Context context) {
-        this.context = context;
-        fUserPhotoSdv.setVisibility(View.INVISIBLE);
-        usernameFirstLetters.setText(DataHelper.getUsername().substring(0, 2));
-        usernameTxt.setText(DataHelper.getUsername());
-        Typeface type = Typeface.createFromAsset(this.context.getAssets(), "arial-rounded-mt-bold.ttf");
-        hSuggestionBtn.setTypeface(type);
-        hFollowingBtn.setTypeface(type);
-        final UserModel userModel = new UserModel();
-        userModel.setId(DataHelper.getUserId());
-        userModel.fetch(new NetworkCallback() {
-            @Override
-            public void exec(ErrorModel errorModel) {
-                if (userModel.getProfile_picture_key() != null){
-                    fUserPhotoSdv.setVisibility(View.VISIBLE);
-                    userModel.loadPhoto(fUserPhotoSdv, new SimpleCallback2() {
-                        @Override
-                        public void callbackCall() {
+        if (!isUpdated){
+            isUpdated = true;
+            this.context = context;
+            fUserPhotoSdv.setVisibility(View.INVISIBLE);
+            usernameFirstLetters.setText(DataHelper.getUsername().substring(0, 2));
+            usernameTxt.setText(DataHelper.getUsername());
+            Typeface type = Typeface.createFromAsset(this.context.getAssets(), "arial-rounded-mt-bold.ttf");
+            hSuggestionBtn.setTypeface(type);
+            hFollowingBtn.setTypeface(type);
+            final UserModel userModel = new UserModel();
+            userModel.setId(DataHelper.getUserId());
+            userModel.fetch(new NetworkCallback() {
+                @Override
+                public void exec(ErrorModel errorModel) {
+                    if (userModel.getProfile_picture_key() != null){
+                        fUserPhotoSdv.setVisibility(View.VISIBLE);
+                        userModel.loadPhoto(fUserPhotoSdv, new SimpleCallback2() {
+                            @Override
+                            public void callbackCall() {
 
-                        }
-                    });
+                            }
+                        });
+                    }
                 }
-            }
-        });
+            });
+        }
+
     }
 }

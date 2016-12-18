@@ -1,23 +1,15 @@
-package no.twomonkeys.sneek.app.components.feed;
+package no.twomonkeys.sneek.app.components.profile;
 
 import android.content.Context;
-import android.graphics.Color;
 import android.graphics.Typeface;
-import android.graphics.drawable.GradientDrawable;
-import android.support.v4.app.Fragment;
 import android.os.Bundle;
-import android.support.v4.content.ContextCompat;
+import android.support.v4.app.Fragment;
 import android.support.v7.widget.LinearLayoutManager;
-import android.support.v7.widget.PopupMenu;
 import android.support.v7.widget.RecyclerView;
-import android.view.ContextMenu;
 import android.view.LayoutInflater;
-import android.view.Menu;
-import android.view.MenuInflater;
 import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewGroup;
-import android.view.Window;
 import android.view.WindowManager;
 import android.view.inputmethod.InputMethodManager;
 import android.widget.ImageButton;
@@ -28,8 +20,8 @@ import com.orangegangsters.github.swipyrefreshlayout.library.SwipyRefreshLayout;
 import com.orangegangsters.github.swipyrefreshlayout.library.SwipyRefreshLayoutDirection;
 
 import no.twomonkeys.sneek.R;
-
 import no.twomonkeys.sneek.app.components.MainActivity;
+import no.twomonkeys.sneek.app.components.feed.FeedAdapter;
 import no.twomonkeys.sneek.app.components.feed.views.EditView;
 import no.twomonkeys.sneek.app.components.feed.views.SimpleImageViewer;
 import no.twomonkeys.sneek.app.shared.NetworkCallback;
@@ -42,40 +34,37 @@ import no.twomonkeys.sneek.app.shared.models.PostModel;
 import no.twomonkeys.sneek.app.shared.models.UserModel;
 
 /**
- * Created by simenlie on 13.10.2016.
+ * Created by simenlie on 28.10.2016.
  */
-
-public class FeedFragment extends Fragment implements FeedAdapter.Callback, SimpleImageViewer.Callback {
+public class ProfileFragment extends Fragment implements FeedAdapter.Callback, SimpleImageViewer.Callback {
 
     private RecyclerView fRecyclerView;
     private FeedAdapter fAdapter;
     private FeedModel feedModel;
     private SwipyRefreshLayout swipyRefreshLayout;
     private View view;
-    private ImageButton composeBtn, bredMouthBtn, cameraBtn;
     LinearLayoutManager mLayoutManager;
     RelativeLayout feedLl;
-
-
     SimpleImageViewer postSiv;
+    UserModel userModel;
     TextView toolbarTitle;
-
+    ImageButton pCloseBtn;
 
     public interface Callback {
-        public void feedFragmentOnFullScreenStart();
+        public void profileFragmentOnFullScreenStart();
 
-        public void feedFragmentOnFullScreenEnd();
+        public void profileFragmentOnFullScreenEnd();
 
-        public void feedFragmentOnCameraClicked();
+        public void profileFragmentOnCameraClicked();
 
-        public void feedFragmentOnProfileTap(UserModel userModel);
+        public void profileFragmentOnClose();
     }
 
     Callback callback;
 
 
-    public static FeedFragment newInstance() {
-        FeedFragment feedFragment = new FeedFragment();
+    public static no.twomonkeys.sneek.app.components.feed.FeedFragment newInstance() {
+        no.twomonkeys.sneek.app.components.feed.FeedFragment feedFragment = new no.twomonkeys.sneek.app.components.feed.FeedFragment();
         return feedFragment;
     }
 
@@ -87,95 +76,34 @@ public class FeedFragment extends Fragment implements FeedAdapter.Callback, Simp
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
-        view = inflater.inflate(R.layout.fragment_feed, container, false);
+        view = inflater.inflate(R.layout.fragment_profile, container, false);
         feedLl = (RelativeLayout) view.findViewById(R.id.feed);
 
         mLayoutManager = getmLayoutManager();
         fRecyclerView = getfRecyclerView();
         swipyRefreshLayout = getSwipyRefreshLayout();
-
-
-        postSiv = (SimpleImageViewer) view.findViewById(R.id.postSiv);
+        postSiv = (SimpleImageViewer) view.findViewById(R.id.pSimpleImgViewer);
         postSiv.addCallback(this);
+        pCloseBtn = (ImageButton) view.findViewById(R.id.pCloseBtn);
+        pCloseBtn.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                //Close here
+                callback.profileFragmentOnClose();
+            }
+        });
 
-        //toolbarTitle = (TextView) view.findViewById(R.id.toolbar_title);
-        //Typeface type = Typeface.createFromAsset(getActivity().getAssets(), "arial-rounded-mt-bold.ttf");
+        toolbarTitle = (TextView) view.findViewById(R.id.pToolbar_title);
+        Typeface type = Typeface.createFromAsset(getActivity().getAssets(), "arial-rounded-mt-bold.ttf");
         //toolbarTitle.setTypeface(type);
-        fetchFeed();
-        composeBtn = getComposeBtn();
-        bredMouthBtn = getBredMouthBtn();
-        cameraBtn = getCameraBtn();
-
-
-
-        GradientDrawable shape =  new GradientDrawable();
-        shape.setColor(ContextCompat.getColor(getActivity(), R.color.white));
-
-        float[] rectCorners = new float[]{UIHelper.dpToPx(getContext(), 10),UIHelper.dpToPx(getContext(), 10),0,0};
-        float[] newRectCorners = new float[]{rectCorners[0], rectCorners[0], rectCorners[1], rectCorners[1], rectCorners[2],rectCorners[2],rectCorners[3],rectCorners[3]};
-        shape.setCornerRadii(newRectCorners);
-        //    mainRl.setBackground(shape);
-
-        feedLl.setBackground(shape);
-
-
         return view;
     }
-
-
-    //Object creation
-
-    private ImageButton getComposeBtn() {
-        if (this.composeBtn == null) {
-            ImageButton composeBtn = (ImageButton) view.findViewById(R.id.composeBtn);
-            composeBtn.setOnClickListener(new View.OnClickListener() {
-                @Override
-                public void onClick(View v) {
-
-                }
-            });
-            composeBtn.setColorFilter(ContextCompat.getColor(getActivity(), R.color.themeColor)); // White Tint
-            this.composeBtn = composeBtn;
-        }
-        return this.composeBtn;
-    }
-
-    private ImageButton getBredMouthBtn() {
-        if (this.bredMouthBtn == null) {
-            ImageButton bredMouthBtn = (ImageButton) view.findViewById(R.id.bredMouthBtn);
-            bredMouthBtn.setOnClickListener(new View.OnClickListener() {
-                @Override
-                public void onClick(View v) {
-
-                }
-            });
-            this.bredMouthBtn = bredMouthBtn;
-        }
-        return this.bredMouthBtn;
-    }
-
-    private ImageButton getCameraBtn() {
-        if (this.cameraBtn == null) {
-            ImageButton cameraBtn = (ImageButton) view.findViewById(R.id.cameraBtn);
-            cameraBtn.setOnClickListener(new View.OnClickListener() {
-                @Override
-                public void onClick(View v) {
-                    callback.feedFragmentOnCameraClicked();
-                }
-            });
-            this.cameraBtn = cameraBtn;
-        }
-        return this.cameraBtn;
-    }
-
 
     private LinearLayoutManager getmLayoutManager() {
         if (this.mLayoutManager == null) {
             LinearLayoutManager mLayoutManager = new LinearLayoutManager(getActivity());
             //mLayoutManager.setStackFromEnd(true);
             mLayoutManager.setReverseLayout(true);
-
-
             this.mLayoutManager = mLayoutManager;
         }
         return this.mLayoutManager;
@@ -184,7 +112,7 @@ public class FeedFragment extends Fragment implements FeedAdapter.Callback, Simp
 
     private RecyclerView getfRecyclerView() {
         if (this.fRecyclerView == null) {
-            RecyclerView fRecyclerView = (RecyclerView) view.findViewById(R.id.feed_recycler_view);
+            RecyclerView fRecyclerView = (RecyclerView) view.findViewById(R.id.profile_recycler_view);
             fRecyclerView.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {
@@ -221,11 +149,11 @@ public class FeedFragment extends Fragment implements FeedAdapter.Callback, Simp
 
     private SwipyRefreshLayout getSwipyRefreshLayout() {
         if (this.swipyRefreshLayout == null) {
-            SwipyRefreshLayout swipyRefreshLayout = (SwipyRefreshLayout) view.findViewById(R.id.swipyrefreshlayout);
+            SwipyRefreshLayout swipyRefreshLayout = (SwipyRefreshLayout) view.findViewById(R.id.pSwipyrefreshlayout);
             swipyRefreshLayout.setOnRefreshListener(new SwipyRefreshLayout.OnRefreshListener() {
                 @Override
                 public void onRefresh(SwipyRefreshLayoutDirection direction) {
-                    fetchFeed();
+                    fetchUser(userModel);
                 }
             });
             this.swipyRefreshLayout = swipyRefreshLayout;
@@ -233,13 +161,19 @@ public class FeedFragment extends Fragment implements FeedAdapter.Callback, Simp
         return this.swipyRefreshLayout;
     }
 
+    public void updateUser(UserModel userModel) {
+        this.userModel = userModel;
+        this.toolbarTitle.setText(userModel.getUsername());
+        fetchUser(userModel);
+    }
+
     //Data retrival
-    private void fetchFeed() {
-        final FeedFragment mFeedFragment = this;
+    private void fetchUser(UserModel userModel) {
+        final ProfileFragment mFeedFragment = this;
         if (feedModel == null) {
             feedModel = new FeedModel();
         }
-        feedModel.fetch(new NetworkCallback() {
+        feedModel.fetchUserMoments(userModel.getId(), new NetworkCallback() {
             @Override
             public void exec(ErrorModel errorModel) {
                 fAdapter = new FeedAdapter(feedModel.getPosts());
@@ -255,20 +189,6 @@ public class FeedFragment extends Fragment implements FeedAdapter.Callback, Simp
         swipyRefreshLayout.setRefreshing(false);
     }
 
-
-    public void addNewImagePost(final PostModel postModel) {
-        fAdapter.addPost(postModel);
-        System.out.println("ADDED POST");
-        postModel.save(new NetworkCallback() {
-            @Override
-            public void exec(ErrorModel errorModel) {
-                System.out.println("SUCCESS UPLOAD WHOLE");
-                postModel.setImage(postModel.getImage());
-                fAdapter.replacePost(postModel);
-            }
-        });
-    }
-
     @Override
     public void feedAdapterTap(PostModel postModel) {
         getActivity().getWindow().setFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN, WindowManager.LayoutParams.FLAG_FULLSCREEN);
@@ -280,7 +200,6 @@ public class FeedFragment extends Fragment implements FeedAdapter.Callback, Simp
         postSiv.setVisibility(View.VISIBLE);
         postSiv.updatePost(postModel);
         postSiv.setVisibility(View.VISIBLE);
-
     }
 
     @Override
@@ -290,7 +209,7 @@ public class FeedFragment extends Fragment implements FeedAdapter.Callback, Simp
 
     @Override
     public void feedAdapterShowProfile(UserModel userModel) {
-        callback.feedFragmentOnProfileTap(userModel);
+
     }
 
     public void addCallback(Callback callback) {
@@ -311,3 +230,4 @@ public class FeedFragment extends Fragment implements FeedAdapter.Callback, Simp
 
     }
 }
+

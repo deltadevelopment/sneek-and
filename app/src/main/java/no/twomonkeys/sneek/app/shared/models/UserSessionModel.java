@@ -63,6 +63,7 @@ public class UserSessionModel extends CRUDModel {
     }
 
     public void save(NetworkCallback scb) {
+        System.out.println("sending data to login: " + asJSON());
         NetworkHelper.sendRequest(NetworkHelper.getNetworkService().postLogin(asJSON()),
                 GenericContract.v1_post_login(),
                 onDataReturned(),

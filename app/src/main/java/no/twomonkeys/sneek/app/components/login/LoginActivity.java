@@ -625,6 +625,7 @@ public class LoginActivity extends Activity implements KeyboardUtil.Callback {
             usernameEditText.clearFocus();
             userSession = new UserSessionModel();
             userSession.setUserModel(userModel);
+
             userSession.save(new NetworkCallback() {
                 @Override
                 public void exec(ErrorModel errorModel) {
@@ -635,6 +636,7 @@ public class LoginActivity extends Activity implements KeyboardUtil.Callback {
     }
 
     public void onResponseRecieved(ErrorModel errorModel) {
+        System.out.println("trying o login");
         if (errorModel == null) {
             if (isRegistering) {
                 Log.v("Storing token", "Storing reg " + userModel.getUsername());

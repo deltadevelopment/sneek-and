@@ -70,6 +70,7 @@ public class UserModel extends CRUDModel {
         profile_picture_key = (String) map.get("profile_picture_key");
         profile_picture_url = (String) map.get("profile_picture_url");
         is_following = booleanFromObject(map.get("is_following"));
+        System.out.println("last moment " + map);
         if (map.get("last_moment") != null) {
             lastPost = new PostModel((Map) map.get("last_moment"));
         }

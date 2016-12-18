@@ -1,0 +1,85 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/feed"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:layout_weight="1"
+    android:background="@color/white"
+    android:orientation="vertical"
+    tools:context="no.twomonkeys.sneek.app.components.MainActivity">
+
+    <RelativeLayout
+        android:layout_width="match_parent"
+        android:layout_height="56dp"
+        android:background="@color/editBgGrey">
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:orientation="horizontal">
+            <ImageButton
+                android:id="@+id/pCloseBtn"
+                android:layout_width="50dp"
+                android:layout_height="56dp"
+                android:padding="15dp"
+                android:background="@null"
+                android:scaleType="fitCenter"
+                android:tint="@color/themeColor"
+                android:src="@drawable/minimizex3"/>
+            <TextView
+                android:id="@+id/pToolbar_title"
+                android:layout_width="wrap_content"
+                android:layout_height="match_parent"
+                android:gravity="center_vertical"
+                android:textColor="@color/themeColor"
+                android:layout_gravity="left"
+                android:padding="10dp"
+                android:textSize="20sp"
+                android:text="sneek" />
+
+        </LinearLayout>
+        <ImageButton
+            android:layout_width="40dp"
+            android:layout_height="56dp"
+            android:background="@null"
+            android:padding="10dp"
+            android:layout_alignParentRight="true"
+            android:tint="@color/themeColor"
+            android:scaleType="fitCenter"
+            android:src="@drawable/dotshoricon"/>
+    </RelativeLayout>
+
+    <RelativeLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:layout_marginTop="56dp">
+
+        <com.orangegangsters.github.swipyrefreshlayout.library.SwipyRefreshLayout
+            android:id="@+id/pSwipyrefreshlayout"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginBottom="50dp"
+            app:srl_direction="bottom">
+
+            <android.support.v7.widget.RecyclerView
+                android:id="@+id/profile_recycler_view"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:scrollbars="vertical" />
+        </com.orangegangsters.github.swipyrefreshlayout.library.SwipyRefreshLayout>
+    </RelativeLayout>
+
+    <View
+        android:layout_width="match_parent"
+        android:layout_marginTop="56dp"
+        android:layout_height="5dp"
+        android:background="@drawable/toolbar_dropshadow" />
+
+    <no.twomonkeys.sneek.app.components.feed.views.SimpleImageViewer
+        android:id="@+id/pSimpleImgViewer"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:visibility="invisible"></no.twomonkeys.sneek.app.components.feed.views.SimpleImageViewer>
+
+</RelativeLayout>

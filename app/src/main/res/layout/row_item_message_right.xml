@@ -12,7 +12,25 @@
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:orientation="horizontal">
+        android:orientation="horizontal"
+        android:gravity="right">
+        <RelativeLayout
+            android:id="@+id/messageRl"
+            android:layout_height="wrap_content"
+            android:layout_width="wrap_content"
+            android:background="@drawable/box_bg"
+            android:layout_marginLeft="60dp">
+            <TextView
+                android:id="@+id/messageTv"
+                android:textSize="16sp"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Whats up everybody?"
+                android:padding="10dp"
+                android:minHeight="20dip"
+                android:textColor="@color/blackColor"
+                android:textAllCaps="false" />
+        </RelativeLayout>
         <RelativeLayout
             android:id="@+id/iProfileLayout"
             android:layout_width="50dp"
@@ -22,6 +40,7 @@
                 android:id="@+id/iProfileImgBtn"
                 android:layout_width="40dp"
                 android:layout_height="40dp"
+                android:layout_alignParentRight="true"
                 android:background="@drawable/circle"
                 fresco:roundedCornerRadius="20dp"
                 android:layout_alignParentBottom="true"/>
@@ -30,46 +49,28 @@
                 android:textSize="18sp"
                 android:layout_width="40dp"
                 android:layout_height="40dp"
+                android:layout_alignParentRight="true"
                 android:gravity="center"
                 android:text="AI"
                 android:textColor="@color/white"
                 android:textAllCaps="true"
                 android:layout_alignParentBottom="true"/>
         </RelativeLayout>
-
-        <RelativeLayout
-            android:id="@+id/messageRl"
-            android:layout_height="wrap_content"
-            android:layout_width="wrap_content"
-            android:background="@drawable/box_bg"
-            android:layout_marginRight="60dp">
-            <TextView
-                android:id="@+id/messageTv"
-                android:textSize="16sp"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="Whats up everybody?"
-                android:gravity="left"
-                android:padding="10dp"
-                android:minHeight="20dip"
-                android:textColor="@color/blackColor"
-                android:textAllCaps="false" />
-        </RelativeLayout>
     </LinearLayout>
     <RelativeLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content">
-
         <LinearLayout
+            android:layout_alignParentRight="true"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginTop="5dp"
-            android:textSize="13sp"
-            android:layout_marginLeft="60dp"
+            android:layout_marginRight="60dp"
             android:id="@+id/userLayout"
             android:orientation="horizontal">
             <TextView
                 android:id="@+id/usernameTv"
+                android:textSize="13sp"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:textColor="@color/usernameGrey"

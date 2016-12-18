@@ -53,12 +53,17 @@ public class NetworkHelper {
     public static SneekApi getNetworkService() {
         // TODO: When implementing login replace this
         // String authToken = DataHelper.getAuthToken();
-        String authToken = "d389085148bfd1678041e634e12638ca";
+        String authToken = DataHelper.getAuthToken();
+        System.out.println("authtoken " + authToken);
+
+        if (authToken == null) {
+            networkService = ServiceGenerator.createService(SneekApi.class);
+            return networkService;
+        }
         if (authToken != auth_token) {
             auth_token = authToken;
             networkService = ServiceGenerator.createService(SneekApi.class, DataHelper.getAuthToken());
         }
-
         return networkService;
     }
 
@@ -70,7 +75,8 @@ public class NetworkHelper {
         Log.d(TAG, "onResponse - Status : " + response.code());
         if (response.code() == 401) {
             //Log out
-            // DataHelper.startActivity.logout();
+            DataHelper.startActivity.logout();
+            System.out.println("Should log out the user here");
         }
         Log.d(TAG, "onResponse - BODY : " + response.body());
 

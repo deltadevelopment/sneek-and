@@ -18,8 +18,8 @@ public class StartActivity extends Activity {
         super.onCreate(savedInstanceState);
 
         setContentView(R.layout.activity_start);
-
-       // DataHelper.setStartActivity(this);
+        DataHelper.setContext(this);
+        DataHelper.setStartActivity(this);
         DataHelper.setContext(this);
         System.out.println("AUTH TOKEN IS " + DataHelper.getAuthToken());
         if (DataHelper.getAuthToken() == null) {

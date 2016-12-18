@@ -1,0 +1,52 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:background="@drawable/top_bar_bg"
+    android:layout_margin="10dp"
+    android:layout_height="50dp">
+   <LinearLayout
+       android:layout_width="match_parent"
+       android:layout_height="match_parent"
+       android:orientation="horizontal">
+       <ImageButton
+           android:layout_width="30dp"
+           android:layout_height="30dp"
+           android:layout_gravity="center"
+           android:padding="5dp"
+           android:layout_marginLeft="5dp"
+           android:src="@drawable/menu_icon"
+           android:background="@null"
+           android:scaleType="fitCenter"
+            />
+
+       <Space
+           android:layout_width="0dp"
+           android:layout_height="1dp"
+           android:layout_weight="1"></Space>
+
+       <ImageButton
+           android:layout_width="70dp"
+           android:layout_height="30dp"
+           android:layout_gravity="center"
+           android:src="@drawable/sneek_logo_red"
+           android:background="@null"
+           android:scaleType="fitCenter"
+           />
+
+       <Space
+           android:layout_width="0dp"
+           android:layout_height="1dp"
+           android:layout_weight="1"></Space>
+
+       <ImageButton
+           android:layout_width="30dp"
+           android:layout_height="30dp"
+           android:layout_gravity="center"
+           android:layout_marginRight="5dp"
+           android:padding="5dp"
+           android:src="@drawable/user_icon"
+           android:background="@null"
+           android:scaleType="fitCenter"
+           />
+   </LinearLayout>
+</RelativeLayout>

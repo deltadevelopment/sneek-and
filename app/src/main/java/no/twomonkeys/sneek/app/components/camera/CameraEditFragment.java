@@ -31,16 +31,20 @@ import jp.co.cyberagent.android.gpuimage.GPUImageContrastFilter;
 import jp.co.cyberagent.android.gpuimage.GPUImageFilter;
 import jp.co.cyberagent.android.gpuimage.GPUImageFilterGroup;
 import no.twomonkeys.sneek.R;
+import no.twomonkeys.sneek.app.components.MainActivity;
 import no.twomonkeys.sneek.app.components.filters.IFBrannanFilter;
 import no.twomonkeys.sneek.app.components.filters.IFInkwellFilter;
 import no.twomonkeys.sneek.app.components.filters.IFWaldenFilter;
 import no.twomonkeys.sneek.app.shared.NetworkCallback;
 import no.twomonkeys.sneek.app.shared.SimpleCallback2;
+import no.twomonkeys.sneek.app.shared.helpers.DataHelper;
+import no.twomonkeys.sneek.app.shared.helpers.DateHelper;
 import no.twomonkeys.sneek.app.shared.helpers.DiskHelper;
 import no.twomonkeys.sneek.app.shared.helpers.GraphicsHelper;
 import no.twomonkeys.sneek.app.shared.helpers.UIHelper;
 import no.twomonkeys.sneek.app.shared.models.ErrorModel;
 import no.twomonkeys.sneek.app.shared.models.PostModel;
+import no.twomonkeys.sneek.app.shared.models.UserModel;
 
 /**
  * Created by simenlie on 05.10.2016.
@@ -152,11 +156,21 @@ public class CameraEditFragment extends Fragment {
     {
         cancelClick();
         Bitmap bitmap = ((BitmapDrawable)imageView.getDrawable()).getBitmap();
+
+        UserModel userModel = new UserModel();
+        userModel.setId(DataHelper.getUserId());
+        userModel.setUsername(DataHelper.getUsername());
+
         final PostModel postModel = new PostModel();
+        postModel.setUserModel(userModel);
         postModel.setMedia_type(0);
-        postModel.setExpireIndex(expireIndex);
         postModel.setImage(bitmap);
+        postModel.setImage_width(bitmap.getWidth());
+        postModel.setImage_height(bitmap.getHeight());
+        postModel.setCreated_at(DateHelper.dateNowInString());
+        postModel.setExpireIndex(expireIndex);
         postModel.setCaption(caption);
+        postModel.size = UIHelper.getOptimalSize(getActivity(), postModel.getImage_width(), postModel.getImage_height());
         postModel.generateFile(getActivity(), new SimpleCallback2() {
             @Override
             public void callbackCall() {

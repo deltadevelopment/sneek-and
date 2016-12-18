@@ -104,6 +104,12 @@ public class SimpleImageViewer extends RelativeLayout {
                 return true;
             }
         });
+        setOnClickListener(new OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                animateOut();
+            }
+        });
     }
 
     public Size getFullScreenSize(float width, float height) {
@@ -341,6 +347,7 @@ public class SimpleImageViewer extends RelativeLayout {
                 .withEndAction(new Runnable() {
                     @Override
                     public void run() {
+                        movingUp = false;
                         setVisibility(INVISIBLE);
                         callback.simpleImageViewerClose();
                     }

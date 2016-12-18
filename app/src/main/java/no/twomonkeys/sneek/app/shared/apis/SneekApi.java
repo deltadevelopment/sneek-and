@@ -29,6 +29,16 @@ public interface SneekApi {
     @POST("v1/post")
     Call<ResponseModel> postPost(@Body HashMap<String, HashMap> body);
 
+    @DELETE("v1/post/{post_id}")
+    Call<ResponseModel> deletePost(
+            @Path("post_id") String post_id
+    );
+
+    @GET("v1/user/{user_id}/story")
+    Call<ResponseModel> getUserMoments(
+            @Path("user_id") int user_id
+    );
+
     // Feed
     @GET("v1/feed/following")
     Call<ResponseModel> getFeedFollowing();
@@ -70,5 +80,17 @@ public interface SneekApi {
     @Headers("Content-Type: multipart/form-data;boundary=95416089-b2fd-4eab-9a14-166bb9c5788b")
     Call<ResponseBody> upload(@Url String url,
                               @Body RequestBody body);
+
+    // Pin
+    @POST("v1/post/{post_id}/pin")
+    Call<ResponseModel> postPin(
+            @Path("post_id") String post_id
+    );
+
+    @DELETE("v1/post/{post_id}/pin")
+    Call<ResponseModel> deletePin(
+            @Path("post_id") String post_id
+    );
+
 
 }

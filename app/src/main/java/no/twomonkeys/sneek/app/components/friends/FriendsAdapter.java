@@ -16,6 +16,7 @@ import java.util.ArrayList;
 import java.util.Random;
 
 import no.twomonkeys.sneek.R;
+import no.twomonkeys.sneek.app.components.feed.FeedViewHolder;
 import no.twomonkeys.sneek.app.components.feed.ImageViewHolder;
 import no.twomonkeys.sneek.app.shared.models.FollowingModel;
 import no.twomonkeys.sneek.app.shared.models.PostModel;
@@ -28,12 +29,17 @@ import retrofit2.http.HEAD;
  * Copyright 2MONKEYS AS
  */
 
-class FriendsAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> implements HeaderViewHolder.Callback {
+class FriendsAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> implements HeaderViewHolder.Callback, FriendsViewHolder.Callback {
+
+    @Override
+    public void friendsViewHolderDidTap() {
+        callback.friendsAdapterDidClickCell();
+    }
 
     public interface Callback {
         void adapterDidClickSuggestion();
-
         void adapterDidClickFollowing();
+        void friendsAdapterDidClickCell();
     }
 
     private Callback callback;
@@ -43,6 +49,7 @@ class FriendsAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> imple
         this.callback = callback;
     }
 
+    public HeaderViewHolder headerViewHolder;
     private ArrayList<UserModel> followings;
     private ArrayList<UserModel> suggestions;
 
@@ -80,7 +87,6 @@ class FriendsAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> imple
 
     }
 
-
     @Override
     public int getItemViewType(int position) {
         if (position == 0) {
@@ -95,10 +101,15 @@ class FriendsAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> imple
         this.mContext = parent.getContext();
         if (viewType == 0) {
             View view = LayoutInflater.from(mContext).inflate(R.layout.row_item_header, parent, false);
-            return new HeaderViewHolder(view);
+            if (headerViewHolder == null){
+                headerViewHolder = new HeaderViewHolder(view);
+            }
+            return headerViewHolder;
         } else {
             View view = LayoutInflater.from(mContext).inflate(R.layout.row_item_friends, parent, false);
-            return new FriendsViewHolder(view);
+            FriendsViewHolder fvh = new FriendsViewHolder(view);
+            fvh.addCallback(this);
+            return fvh;
         }
     }
 
@@ -122,7 +133,6 @@ class FriendsAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> imple
         }
         return followings != null ? followings.size() + 1 : 0;
     }
-
 
 
 }
